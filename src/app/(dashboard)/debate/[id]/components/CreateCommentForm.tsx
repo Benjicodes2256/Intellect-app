@@ -17,7 +17,11 @@ export default function CreateCommentForm({ debateId }: { debateId: string }) {
         setIsSubmitting(true)
         try {
             // Top level argument, no parentId
-            await createCommentAction(debateId, content, stance)
+            const result = await createCommentAction(debateId, content, stance)
+            if (result?.error) {
+                alert(result.error)
+                return
+            }
             setContent('')
         } catch (error: any) {
             alert(error.message || "Failed to submit comment")

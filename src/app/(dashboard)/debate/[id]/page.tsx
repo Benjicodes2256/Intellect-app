@@ -98,11 +98,20 @@ export default async function DebateThreadPage({ params }: { params: Promise<{ i
             <div className="flex-1 space-y-3 mb-2 px-2 flex flex-col">
                 <h3 className="font-bold text-gray-900 px-2 tracking-wide uppercase text-sm mb-2 text-center opacity-50">Live Arguments</h3>
 
-                {comments?.length === 0 && (
-                    <div className="text-center text-sm text-gray-500 py-6 font-medium bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                        No arguments yet. Make the first move.
+                {/* Eureka System Welcome Message */}
+                <div className="flex flex-col w-full mb-3 items-center">
+                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50/50 border border-blue-100/50 rounded-2xl p-4 shadow-sm max-w-[95%] md:max-w-[85%] text-center relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#0055ff] to-purple-500 opacity-50"></div>
+                        <div className="font-black text-transparent bg-clip-text bg-gradient-to-r from-[#0055ff] to-purple-600 mb-2 flex items-center justify-center gap-1.5 text-[10px] tracking-widest uppercase">
+                            Eureka System
+                        </div>
+                        <div className="text-[13px] text-gray-700 leading-relaxed font-medium">
+                            Welcome to the Arena. The topic is <span className="font-bold text-gray-900 leading-relaxed px-1">"{debate.topic}"</span>.
+                            <br /><br />
+                            Remember the Charter: logical integrity is required. Unsubstantiated claims will be penalized, and factual logic will be rewarded. Make the first move to earn Reputation Points!
+                        </div>
                     </div>
-                )}
+                </div>
 
                 {comments?.map((comment: any) => {
                     const isMe = userId === comment.author_id;

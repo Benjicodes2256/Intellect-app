@@ -23,7 +23,11 @@ export default function InlineDebateReplyForm({ debateId, parentId, parentAuthor
 
         setIsSubmitting(true)
         try {
-            await createCommentAction(debateId, content, stance, parentId)
+            const result = await createCommentAction(debateId, content, stance, parentId)
+            if (result?.error) {
+                alert(result.error)
+                return
+            }
             setContent('')
             onClose()
         } catch (error: any) {

@@ -29,8 +29,8 @@ export async function createCommentAction(
         .eq("id", debateId)
         .single()
 
-    if (debateError || !debateData) throw new Error("Debate not found")
-    if (debateData.is_closed) throw new Error("This debate is already closed.")
+    if (debateError || !debateData) return { error: "Debate not found" }
+    if (debateData.is_closed) return { error: "This debate is already closed." }
 
     // 2. Insert Comment Initial
     const payload: any = {
@@ -49,7 +49,7 @@ export async function createCommentAction(
         .insert(payload)
 
     if (insertError) {
-        throw new Error(insertError.message)
+        return { error: insertError.message }
     }
 
     // 3. Fire-and-forget Eureka evaluation (Graceful Degradation)
@@ -57,6 +57,7 @@ export async function createCommentAction(
     // We'll just revalidate so the comment shows up immediately.
 
     revalidatePath(`/debate/${debateId}`)
+    return { success: true }
 }
 
 export async function toggleLikeCommentAction(commentId: string, debouncePath: string) {
