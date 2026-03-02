@@ -66,10 +66,16 @@ export async function POST(req: Request) {
             Transcript of Arguments:
             ${transcript}
             
-            Task: Write a highly structured, 2-3 paragraph closing summary of the debate. 
-            Highlight the strongest points made by both the FOR and AGAINST sides. 
-            Declare the overarching consensus or the most logical conclusion based solely on the provided transcript.
-            Format it in clean markdown.
+            Task: Write a final summary of the debate following strict "Smart Brevity" rules:
+            1. Be Punchy: Use short sentences and simple, accessible language. Zero academic jargon or fluff.
+            2. Be Visual: Use bold text to highlight key concepts, and use bullet points for the main arguments.
+            3. Structure: 
+               - Start with a strong 1-sentence TL;DR of what happened.
+               - List 1-2 bullet points for the strongest FOR argument.
+               - List 1-2 bullet points for the strongest AGAINST argument.
+               - Conclude with a final 1-sentence verdict on the overarching logical consensus.
+            
+            Format the output in clean markdown. 
             `
 
             try {
