@@ -37,6 +37,7 @@ export async function POST(req: Request) {
         2. Be Punchy: Use short sentences and simple, accessible language. Zero academic jargon or fluff.
         3. Be Visual: Use bold text to highlight the core tensions.
         4. Be Neutral: You must perfectly balance the prompt so participants can argue both sides equally. Do NOT conclude the debate or offer a solution. Strictly present the central conflict.
+        5. Tone: You are writing this text on behalf of the User who is hosting the debate. DO NOT introduce yourself as Eureka. Just jump straight into the context.
 
         Formatting Rules:
         - Use standard English punctuation.
