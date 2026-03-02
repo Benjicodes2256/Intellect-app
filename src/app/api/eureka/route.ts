@@ -5,8 +5,8 @@ import { GoogleGenAI } from '@google/genai';
 // Initialize bare Google Gen AI SDK
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-// INCREASE TIMEOUT TO 60 SECONDS FOR VERCEL
-export const maxDuration = 60;
+// USE EDGE RUNTIME TO BYPASS 10-SECOND VERCEL NODE TIMEOUT
+export const runtime = 'edge';
 
 export async function POST(req: Request) {
     try {
