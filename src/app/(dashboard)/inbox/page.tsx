@@ -8,13 +8,13 @@ function CharterBanner() {
     return (
         <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 mb-6 transition-all">
             <div className="flex justify-between items-center cursor-pointer">
-                <h3 className="font-bold text-sm flex items-center gap-2">
+                <h3 className="font-bold text-sm flex items-center gap-2 text-gray-900">
                     <Info className="text-[#0055ff]" size={16} />
                     🏛️ The iNTELlect Community Charter
                 </h3>
             </div>
 
-            <ul className="text-xs text-gray-600 space-y-3 mt-4 border-t border-gray-100 pt-4">
+            <ul className="text-xs text-gray-800 space-y-3 mt-4 border-t border-gray-200 pt-4">
                 <li><strong>Attack the Idea, Not the Person:</strong> All debates must focus on the logic. Personal attacks result in removal.</li>
                 <li><strong>The "Logic Point" Rule:</strong> Every comment should add value. Avoid "fluff".</li>
                 <li><strong>No Vulgarity or Profanity:</strong> iNTELlect is a professional utility.</li>
