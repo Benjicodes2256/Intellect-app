@@ -66,7 +66,7 @@ function DebateTile({ debate, isOwner }: { debate: any, isOwner: boolean }) {
             </h2>
 
             {debate.introduction && (
-                <div className="mb-4 text-xs text-gray-600 line-clamp-3 prose prose-sm max-w-none prose-p:leading-snug prose-li:my-0">
+                <div className="mb-4 text-xs text-gray-600 prose prose-sm max-w-none prose-p:leading-snug prose-li:my-0">
                     <ReactMarkdown>
                         {debate.introduction}
                     </ReactMarkdown>
