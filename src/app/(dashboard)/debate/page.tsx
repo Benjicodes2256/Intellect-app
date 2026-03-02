@@ -1,6 +1,7 @@
 import { Flame, Users, Clock, Trash2, ArrowRight } from 'lucide-react'
 import { clsx } from 'clsx'
 import Link from 'next/link'
+import ReactMarkdown from 'react-markdown'
 import { auth } from "@clerk/nextjs/server"
 import { createSupabaseClient } from '@/lib/supabase/client'
 import CreateDebateButton from './components/CreateDebateModal'
@@ -63,6 +64,14 @@ function DebateTile({ debate, isOwner }: { debate: any, isOwner: boolean }) {
             <h2 className="text-lg font-bold text-gray-900 leading-snug mb-3 group-hover:text-[#0055ff] transition-colors">
                 {debate.topic}
             </h2>
+
+            {debate.introduction && (
+                <div className="mb-4 text-xs text-gray-600 line-clamp-3 prose prose-sm max-w-none prose-p:leading-snug prose-li:my-0">
+                    <ReactMarkdown>
+                        {debate.introduction}
+                    </ReactMarkdown>
+                </div>
+            )}
 
             <div className="flex items-center gap-1 text-xs text-gray-500 font-medium mb-2">
                 <Users size={14} /> 0 Participants • Created by {debate.users?.clerk_username || 'Unknown User'}
