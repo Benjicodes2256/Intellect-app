@@ -6,6 +6,7 @@ import { createSupabaseClient } from '@/lib/supabase/client'
 import { notFound } from 'next/navigation'
 import CreateCommentForm from './components/CreateCommentForm'
 import DebateCommentActions from './components/DebateCommentActions'
+import CloseDebateButton from './components/CloseDebateButton'
 
 export default async function DebateThreadPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
@@ -72,6 +73,10 @@ export default async function DebateThreadPage({ params }: { params: Promise<{ i
                                 <Clock size={14} />
                                 {isClosed ? 'Closed' : `${diffDays}d Left`}
                             </div>
+                            {/* Render Close Button only for the Debate Creator if it's still open */}
+                            {!isClosed && userId === debate.creator_id && (
+                                <CloseDebateButton debateId={debate.id} userId={userId} />
+                            )}
                         </div>
                     </div>
 

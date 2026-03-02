@@ -1,70 +1,114 @@
-import { GoogleGenAI } from '@google/genai'
-import { NextResponse } from 'next/server'
+import { NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+import { GoogleGenAI } from '@google/genai';
 
-// Ensure we don't break the build if the API key is missing locally.
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || 'mock_key' })
+// Initialize bare Google Gen AI SDK
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+// INCREASE TIMEOUT TO 60 SECONDS FOR VERCEL
+export const maxDuration = 60;
 
 export async function POST(req: Request) {
     try {
-        const { comment, topic } = await req.json()
+        const body = await req.json();
+        const { debateId, closingUserId } = body;
 
-        if (!comment || !topic) {
-            return NextResponse.json({ error: 'Missing comment or topic' }, { status: 400 })
+        if (!debateId || !closingUserId) {
+            return NextResponse.json({ error: "Missing required parameters" }, { status: 400 });
         }
 
-        if (!process.env.GEMINI_API_KEY) {
-            console.warn("GEMINI_API_KEY is missing. Skipping actual AI evaluation.")
-            return NextResponse.json({
-                is_vulgar: false,
-                is_fluff: false,
-                points: 0,
-                message: "AI skipped (No API key)",
-            })
+        // We use the Service Role key here because the request is coming from our own server action
+        // in the background without an active user session token context in the edge function.
+        const supabase = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY!,
+            { auth: { persistSession: false } }
+        );
+
+        console.log(`[EUREKA] Starting AI Summarization for debate: ${debateId}`);
+
+        // 1. Fetch debate topic
+        const { data: debate, error: debateError } = await supabase.from('debates').select('*').eq('id', debateId).single()
+        if (debateError || !debate) {
+            console.error(`[EUREKA] Debate fetch failed:`, debateError);
+            return NextResponse.json({ error: "Failed to fetch debate" }, { status: 500 });
         }
 
-        const prompt = `
-    You are Eureka, the AI Moderator of iNTELlect, a platform for high-signal debates.
-    Topic: "${topic}"
-    Comment to evaluate: "${comment}"
+        // 2. Fetch comments with user relations
+        const { data: comments, error: commentsError } = await supabase.from('comments').select('*, users(clerk_username)').eq('debate_id', debateId).order('created_at', { ascending: true })
+        if (commentsError) {
+            console.error(`[EUREKA] Comments fetch failed:`, commentsError);
+            return NextResponse.json({ error: "Failed to fetch comments" }, { status: 500 });
+        }
 
-    Task:
-    1. Check for Profanity/Vulgarity. Respond with "is_vulgar: true" if any.
-    2. Check the "Logic Point" Rule. Is this just fluff (e.g., "I agree", "great post") with no added value? Respond with "is_fluff: true" if so.
-    3. Evaluate if it contains a verifiable fact-check with logic/source. If it aggressively tears down a flaw with logic or adds great value, award "points: [1-5]". Usually 0.
+        let summaryText = ""
 
-    Respond ONLY in strict JSON format:
-    {
-      "is_vulgar": boolean,
-      "is_fluff": boolean,
-      "points": number
-    }
-    `
+        if (!comments || comments.length === 0) {
+            summaryText = "This debate was closed before any arguments were made."
+        } else if (!process.env.GEMINI_API_KEY) {
+            summaryText = "Eureka logged out for the day, Eureka will be back tomorrow"
+        } else {
+            console.log(`[EUREKA] Found ${comments.length} comments. Sending to Gemini...`);
 
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-            config: {
-                responseMimeType: "application/json",
+            const transcript = comments.map((c: any) => `[${c.stance.toUpperCase()}] ${c.users?.clerk_username || 'Participant'}: ${c.content}`).join('\n')
+            const prompt = `
+            You are Eureka, the AI Moderator. A debate has just concluded.
+            Topic: "${debate.topic}"
+            
+            Transcript of Arguments:
+            ${transcript}
+            
+            Task: Write a highly structured, 2-3 paragraph closing summary of the debate. 
+            Highlight the strongest points made by both the FOR and AGAINST sides. 
+            Declare the overarching consensus or the most logical conclusion based solely on the provided transcript.
+            Format it in clean markdown.
+            `
+
+            try {
+                const response = await ai.models.generateContent({
+                    model: 'gemini-2.5-flash',
+                    contents: prompt,
+                })
+                summaryText = response.text || "Eureka logged out for the day, Eureka will be back tomorrow"
+                console.log(`[EUREKA] Successfully generated Summary.`);
+            } catch (apiError) {
+                console.error("[EUREKA] Rate Limit / API Error:", apiError)
+                summaryText = "Eureka logged out for the day, Eureka will be back tomorrow"
             }
+        }
+
+        console.log(`[EUREKA] Inserting posts to database (Author: ${closingUserId})...`);
+
+        // 3. Insert the summary as a public feed post flagged as AI
+        const { error: insertError } = await supabase.from('posts').insert({
+            author_id: closingUserId,
+            content: `**[Debate Concluded: ${debate.topic}]**\n\n${summaryText}`,
+            is_eureka_summary: true
         })
 
-        const text = response.text || "{}"
-        const result = JSON.parse(text)
+        if (insertError) {
+            console.error("[EUREKA] Failed to insert feed post:", insertError)
+            return NextResponse.json({ error: "DB Feed Post Insert Failed" }, { status: 500 });
+        }
 
-        return NextResponse.json({
-            is_vulgar: result.is_vulgar || false,
-            is_fluff: result.is_fluff || false,
-            points: result.points || 0,
+        // 4. Insert the summary as a comment in the debate thread
+        const { error: commentInsertError } = await supabase.from('comments').insert({
+            debate_id: debateId,
+            author_id: closingUserId,
+            content: `**[Eureka AI Summary]**\n${summaryText}`,
+            stance: 'neutral',
         })
 
-    } catch (error: any) {
-        console.error("Eureka AI Error:", error)
-        // Graceful degradation: If rate limits hit, don't crash the comment submission.
-        return NextResponse.json({
-            is_vulgar: false,
-            is_fluff: false,
-            points: 0,
-            error: "Rate limit or processing error - bypassed."
-        }, { status: 200 }) // Return 200 so the client accepts it and posts the comment anyway
+        if (commentInsertError) {
+            console.error("[EUREKA] Failed to insert debate comment:", commentInsertError)
+            return NextResponse.json({ error: "DB Comment Insert Failed" }, { status: 500 });
+        }
+
+        console.log(`[EUREKA] Finished successfully!`);
+        return NextResponse.json({ success: true });
+
+    } catch (e: any) {
+        console.error("[EUREKA] Fatal Error:", e)
+        return NextResponse.json({ error: e.message || "Internal Server Error" }, { status: 500 });
     }
 }

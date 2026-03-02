@@ -60,6 +60,48 @@ export async function createCommentAction(
     return { success: true }
 }
 
+export async function closeDebateEarlyAction(debateId: string) {
+    const { userId, getToken } = await auth()
+    if (!userId) {
+        return { error: "Must be logged in to close a debate." }
+    }
+
+    const token = await getToken({ template: "supabase" })
+    const supabase = createSupabaseClient(token || "")
+
+    // Verify ownership
+    const { data: debate } = await supabase
+        .from("debates")
+        .select("creator_id")
+        .eq("id", debateId)
+        .single()
+
+    if (debate?.creator_id !== userId) {
+        // Also check if they are an admin as fallback
+        const { data: userData } = await supabase
+            .from("users")
+            .select("role")
+            .eq("clerk_id", userId)
+            .single()
+
+        if (userData?.role !== 'admin') {
+            return { error: "Only the debate creator can close it early." }
+        }
+    }
+
+    const { error: updateError } = await supabase
+        .from("debates")
+        .update({ is_closed: true })
+        .eq("id", debateId)
+
+    if (updateError) {
+        return { error: updateError.message }
+    }
+
+    revalidatePath(`/debate/${debateId}`)
+    return { success: true }
+}
+
 export async function toggleLikeCommentAction(commentId: string, debouncePath: string) {
     const { userId, getToken } = await auth()
 
