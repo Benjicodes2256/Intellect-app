@@ -1,6 +1,7 @@
 import { Flame, Clock, Users, ArrowLeft, Send } from 'lucide-react'
 import { clsx } from 'clsx'
 import Link from 'next/link'
+import ReactMarkdown from 'react-markdown'
 import { auth } from "@clerk/nextjs/server"
 import { createSupabaseClient } from '@/lib/supabase/client'
 import { notFound } from 'next/navigation'
@@ -113,6 +114,16 @@ export default async function DebateThreadPage({ params }: { params: Promise<{ i
                         <div className="text-[13px] text-gray-700 leading-relaxed font-medium">
                             Welcome to the Arena. The topic is <span className="font-bold text-gray-900 leading-relaxed px-1">"{debate.topic}"</span>.
                             <br /><br />
+                            {debate.introduction && (
+                                <div className="text-left bg-white/50 rounded-xl p-3 my-3 text-xs shadow-inner">
+                                    <h4 className="font-bold text-[#0055ff] mb-1">Debate Context:</h4>
+                                    <div className="prose prose-sm max-w-none text-gray-800 prose-p:leading-relaxed prose-li:my-0">
+                                        <ReactMarkdown>
+                                            {debate.introduction}
+                                        </ReactMarkdown>
+                                    </div>
+                                </div>
+                            )}
                             Remember the Charter: logical integrity is required. Unsubstantiated claims will be penalized, and factual logic will be rewarded. Make the first move to earn Reputation Points!
                         </div>
                     </div>

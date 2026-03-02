@@ -4,7 +4,7 @@ import { auth } from "@clerk/nextjs/server"
 import { createSupabaseClient } from "@/lib/supabase/client"
 import { revalidatePath } from "next/cache"
 
-export async function createDebateAction(topic: string, timeframeDays: number) {
+export async function createDebateAction(topic: string, timeframeDays: number, introduction?: string) {
     const { userId, getToken } = await auth()
 
     if (!userId) {
@@ -20,15 +20,21 @@ export async function createDebateAction(topic: string, timeframeDays: number) {
     const closesAt = new Date()
     closesAt.setDate(closesAt.getDate() + timeframeDays)
 
+    const insertData: any = {
+        creator_id: userId,
+        topic,
+        closes_at: closesAt.toISOString(),
+        is_closed: false,
+        duration_days: timeframeDays,
+    }
+
+    if (introduction && introduction.trim() !== '') {
+        insertData.introduction = introduction.trim()
+    }
+
     const { error } = await supabase
         .from("debates")
-        .insert({
-            creator_id: userId,
-            topic,
-            closes_at: closesAt.toISOString(),
-            is_closed: false,
-            duration_days: timeframeDays,
-        })
+        .insert(insertData)
 
     if (error) {
         console.error("Error creating debate:", error)

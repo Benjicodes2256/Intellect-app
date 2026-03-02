@@ -28,6 +28,7 @@ create table public.debates (
   id uuid default uuid_generate_v4() primary key,
   creator_id text references public.users(clerk_id) on delete cascade not null,
   topic text not null,
+  introduction text,
   rating integer default 0,
   duration_days integer not null, -- 1, 2, or 5
   closes_at timestamp with time zone not null,
