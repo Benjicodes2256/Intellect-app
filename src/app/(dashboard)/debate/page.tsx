@@ -65,7 +65,7 @@ function DebateTile({ debate, isOwner }: { debate: any, isOwner: boolean }) {
             </h2>
 
             <div className="flex items-center gap-1 text-xs text-gray-500 font-medium mb-2">
-                <Users size={14} /> 0 Participants • Created by User
+                <Users size={14} /> 0 Participants • Created by {debate.users?.clerk_username || 'Unknown User'}
             </div>
 
             <DebateBar scoreFor={debate.eureka_score_for || 0} scoreAgainst={debate.eureka_score_against || 0} />
@@ -92,10 +92,10 @@ export default async function DebatePage() {
     const token = await getToken({ template: "supabase" })
     const supabase = createSupabaseClient(token || "")
 
-    // Fetch real debates from Supabase
+    // Fetch real debates from Supabase with creator's username
     const { data: debates, error } = await supabase
         .from('debates')
-        .select('*')
+        .select('*, users!debates_creator_id_fkey(clerk_username)')
         .order('created_at', { ascending: false })
 
     return (
