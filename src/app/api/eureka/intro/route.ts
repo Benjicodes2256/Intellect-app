@@ -35,10 +35,16 @@ export async function POST(req: Request) {
         Rules:
         1. Keep it under 100 words.
         2. Be Punchy: Use short sentences and simple, accessible language. Zero academic jargon or fluff.
-        3. Be Visual: Use bullet points and bold text to highlight the core tensions.
+        3. Be Visual: Use bold text to highlight the core tensions.
         4. Be Neutral: You must perfectly balance the prompt so participants can argue both sides equally. Do NOT conclude the debate or offer a solution. Strictly present the central conflict.
-        
-        Format the output in clean markdown. 
+
+        Formatting Rules:
+        - Use standard English punctuation.
+        - DO NOT use excessive Markdown flourishes like "***" or "...".
+        - Use standard sizing for all text. No large headers (#). 
+        - Use bold text for main section headings, e.g. **The Core Conflict**.
+        - Use italic text for subheadings or emphasis, e.g. *Why it matters*.
+        - Use simple bullet points (-) for lists.
         `;
 
         const response = await ai.models.generateContent({

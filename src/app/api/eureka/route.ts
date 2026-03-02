@@ -75,7 +75,13 @@ export async function POST(req: Request) {
                - List 1-2 bullet points for the strongest AGAINST argument.
                - Conclude with a final 1-sentence verdict on the overarching logical consensus.
             
-            Format the output in clean markdown. 
+            Formatting Rules:
+            - Use standard English punctuation.
+            - DO NOT use excessive Markdown flourishes like "***" or "...".
+            - Use standard sizing for all text. No large headers (#). 
+            - Use bold text for main section headings, e.g. **The Verdict**.
+            - Use italic text for subheadings or emphasis.
+            - Use simple bullet points (-) for lists.
             `
 
             try {
