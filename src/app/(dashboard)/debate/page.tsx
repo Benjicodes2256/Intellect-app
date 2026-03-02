@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { auth } from "@clerk/nextjs/server"
 import { createSupabaseClient } from '@/lib/supabase/client'
 import CreateDebateButton from './components/CreateDebateModal'
+import DeleteDebateButton from './components/DeleteDebateButton'
 
 function DebateBar({ scoreFor, scoreAgainst }: { scoreFor: number, scoreAgainst: number }) {
     const total = scoreFor + scoreAgainst;
@@ -55,9 +56,7 @@ function DebateTile({ debate, isOwner }: { debate: any, isOwner: boolean }) {
                     </div>
                 </div>
                 {isOwner && (
-                    <button className="text-gray-400 hover:text-red-500 transition-colors p-1" title="Delete Debate">
-                        <Trash2 size={16} />
-                    </button>
+                    <DeleteDebateButton debateId={debate.id} />
                 )}
             </div>
 

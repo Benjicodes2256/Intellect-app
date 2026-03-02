@@ -37,3 +37,30 @@ export async function createDebateAction(topic: string, timeframeDays: number) {
 
     revalidatePath("/debate")
 }
+
+export async function deleteDebateAction(debateId: string) {
+    const { userId, getToken } = await auth()
+
+    if (!userId) {
+        return { error: "Must be logged in to delete a debate." }
+    }
+
+    const token = await getToken({ template: "supabase" })
+    if (!token) return { error: "Could not fetch auth token" }
+
+    const supabase = createSupabaseClient(token)
+
+    const { error } = await supabase
+        .from("debates")
+        .delete()
+        .eq("id", debateId)
+        .eq("creator_id", userId) // Enforce ownership check
+
+    if (error) {
+        console.error("Error deleting debate:", error)
+        return { error: error.message }
+    }
+
+    revalidatePath("/debate")
+    return { success: true }
+}
