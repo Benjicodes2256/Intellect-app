@@ -34,7 +34,15 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Failed to fetch debate" }, { status: 500 });
         }
 
-        // 2. Fetch comments with user relations
+        // 2. Verify Authorization
+        if (debate.creator_id !== closingUserId) {
+            const { data: userData } = await supabase.from("users").select("role").eq("clerk_id", closingUserId).single()
+            if (userData?.role !== 'admin') {
+                return NextResponse.json({ error: "Unauthorized: Only the creator can close this debate." }, { status: 403 });
+            }
+        }
+
+        // 3. Fetch comments with user relations
         const { data: comments, error: commentsError } = await supabase.from('comments').select('*, users(clerk_username)').eq('debate_id', debateId).order('created_at', { ascending: true })
         if (commentsError) {
             console.error(`[EUREKA] Comments fetch failed:`, commentsError);
@@ -104,7 +112,18 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "DB Comment Insert Failed" }, { status: 500 });
         }
 
-        console.log(`[EUREKA] Finished successfully!`);
+        // 5. Officially mark the debate as closed now that the AI Summary is posted
+        const { error: lockError } = await supabase
+            .from('debates')
+            .update({ is_closed: true })
+            .eq('id', debateId)
+
+        if (lockError) {
+            console.error("[EUREKA] Failed to lock debate:", lockError)
+            return NextResponse.json({ error: "Failed to cleanly lock debate" }, { status: 500 });
+        }
+
+        console.log(`[EUREKA] Finished successfully! Debate ${debateId} locked.`);
         return NextResponse.json({ success: true });
 
     } catch (e: any) {

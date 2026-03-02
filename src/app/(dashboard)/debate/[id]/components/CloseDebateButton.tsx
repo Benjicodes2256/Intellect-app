@@ -21,26 +21,24 @@ export default function CloseDebateButton({ debateId, userId }: CloseDebateButto
 
         setIsClosing(true)
         try {
-            // 1. Fast execution: Update the DB and UI immediately
-            const result = await closeDebateEarlyAction(debateId)
-
-            if (result?.error) {
-                alert(result.error)
-                return
-            }
-
-            // 2. Background Execution: Fire the AI Summary Webhook without awaiting it
-            // This safely bypasses Vercel's strict 10s Serverless Action limits by moving the AI
-            // processing into a dedicated route configured for 60-second execution.
-            fetch('/api/eureka', {
+            // We hit our custom 60-second maxDuration API route directly.
+            // This safely bypasses Vercel's strict 10s Serverless Action limits for UI pages, 
+            // while making the user stare at the "Closing..." button until it is cleanly done.
+            const response = await fetch('/api/eureka', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ debateId, closingUserId: userId }),
-            }).catch(e => {
-                console.error("Failed to fire background AI webhook:", e)
             })
 
-            // The UI will refresh automatically due to the revalidatePath in closeDebateEarlyAction
+            const result = await response.json()
+
+            if (!response.ok || result.error) {
+                alert(result.error || "Failed to generate AI summary and close debate.")
+                return
+            }
+
+            // Manually refresh the page to see the new Summary and the Closed status
+            window.location.reload()
         } catch (error: any) {
             alert(error.message || "Failed to close debate.")
         } finally {
