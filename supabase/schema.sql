@@ -125,6 +125,8 @@ create policy "Authenticated users can create debates" on public.debates
   for insert with check (public.clerk_user_id() = creator_id);
 create policy "Admins can delete any debate" on public.debates
   for delete using (public.is_admin());
+create policy "Creators can delete their own debates" on public.debates
+  for delete using (public.clerk_user_id() = creator_id);
 create policy "Creators can update their own debates" on public.debates
   for update using (public.clerk_user_id() = creator_id)
   with check (public.clerk_user_id() = creator_id);
