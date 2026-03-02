@@ -54,7 +54,7 @@ export async function POST(req: Request) {
         if (!comments || comments.length === 0) {
             summaryText = "This debate was closed before any arguments were made."
         } else if (!process.env.GEMINI_API_KEY) {
-            summaryText = "Eureka logged out for the day, Eureka will be back tomorrow"
+            summaryText = `Eureka experienced an environment error: GEMINI_API_KEY is undefined in this Edge runtime.`
         } else {
             console.log(`[EUREKA] Found ${comments.length} comments. Sending to Gemini...`);
 
@@ -77,11 +77,11 @@ export async function POST(req: Request) {
                     model: 'gemini-2.5-flash',
                     contents: prompt,
                 })
-                summaryText = response.text || "Eureka logged out for the day, Eureka will be back tomorrow"
+                summaryText = response.text || "Eureka experienced an unknown API failure."
                 console.log(`[EUREKA] Successfully generated Summary.`);
-            } catch (apiError) {
+            } catch (apiError: any) {
                 console.error("[EUREKA] Rate Limit / API Error:", apiError)
-                summaryText = "Eureka logged out for the day, Eureka will be back tomorrow"
+                summaryText = `Eureka encountered a Google API Error: ${apiError?.message || JSON.stringify(apiError)}`
             }
         }
 
