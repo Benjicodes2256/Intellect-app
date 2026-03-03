@@ -5,14 +5,17 @@ import { createClient } from '@supabase/supabase-js'
  * This ensures Row Level Security (RLS) is maintained when accessing the database.
  */
 export const createSupabaseClient = (clerkToken: string) => {
+    const headers: Record<string, string> = {}
+    if (clerkToken) {
+        headers['Authorization'] = `Bearer ${clerkToken}`
+    }
+
     return createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         {
             global: {
-                headers: {
-                    Authorization: `Bearer ${clerkToken}`,
-                },
+                headers,
             },
         }
     )
