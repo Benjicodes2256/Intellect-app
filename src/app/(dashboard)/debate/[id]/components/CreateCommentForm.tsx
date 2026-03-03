@@ -72,7 +72,7 @@ export default function CreateCommentForm({ debateId }: { debateId: string }) {
                     <button
                         type="submit"
                         disabled={isSubmitting || !content.trim()}
-                        className="absolute right-1 top-1/2 -translate-y-1/2 bg-[#0055ff] hover:bg-blue-600 text-white p-1.5 rounded-full transition-colors disabled:opacity-50 disabled:bg-gray-300"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 bg-[#ff5500] hover:bg-[#cc4400] text-white p-1.5 rounded-full transition-colors disabled:opacity-50 disabled:bg-[#ff5500]"
                         title="Send Argument"
                     >
                         <Send size={14} className="ml-[1px]" />
