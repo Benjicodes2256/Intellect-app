@@ -45,6 +45,13 @@ export default async function DebateThreadPage({ params }: { params: Promise<{ i
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
     const isClosed = debate.is_closed || diffDays <= 0
 
+    // Calculate dynamic percentages
+    const forComments = comments?.filter(c => c.stance === 'for').length || 0;
+    const againstComments = comments?.filter(c => c.stance === 'against').length || 0;
+    const totalStanceComments = forComments + againstComments;
+    const displayForScore = totalStanceComments > 0 ? Math.round((forComments / totalStanceComments) * 100) : 50;
+    const displayAgainstScore = totalStanceComments > 0 ? Math.round((againstComments / totalStanceComments) * 100) : 50;
+
     return (
         <div className="animate-in fade-in duration-500 min-h-[calc(100vh-80px)] flex flex-col pb-32 pt-2">
 
@@ -90,11 +97,11 @@ export default async function DebateThreadPage({ params }: { params: Promise<{ i
                     </div>
 
                     <div className="mt-4 flex gap-4">
-                        <div className="flex-1 bg-blue-50/50 p-4 rounded-xl border border-blue-100 text-center">
-                            <div className="text-sm font-bold text-[#0055ff] uppercase">FOR ({debate.eureka_score_for || 0}%)</div>
+                        <div className="flex-1 bg-blue-50/50 p-4 rounded-xl border border-blue-100 text-center transition-all">
+                            <div className="text-sm font-bold text-[#0055ff] uppercase">FOR ({displayForScore}%)</div>
                         </div>
-                        <div className="flex-1 bg-orange-50/50 p-4 rounded-xl border border-orange-100 text-center">
-                            <div className="text-sm font-bold text-[#ff5500] uppercase">AGAINST ({debate.eureka_score_against || 0}%)</div>
+                        <div className="flex-1 bg-orange-50/50 p-4 rounded-xl border border-orange-100 text-center transition-all">
+                            <div className="text-sm font-bold text-[#ff5500] uppercase">AGAINST ({displayAgainstScore}%)</div>
                         </div>
                     </div>
                 </div>
