@@ -11,14 +11,16 @@ export const dynamic = 'force-dynamic'
 
 function DebateBar({ scoreFor, scoreAgainst }: { scoreFor: number, scoreAgainst: number }) {
     const total = scoreFor + scoreAgainst;
-    const percentageFor = total === 0 ? 50 : (scoreFor / total) * 100;
+    // Calculate percentages and round them to nearest integer for clean display
+    const percentageFor = total === 0 ? 50 : Math.round((scoreFor / total) * 100);
+    const percentageAgainst = total === 0 ? 50 : Math.round((scoreAgainst / total) * 100);
 
     return (
         <div className="w-full mt-4 bg-gray-50 p-3 rounded-xl border border-gray-100">
             <div className="flex justify-between items-center text-xs font-bold text-gray-400 mb-2 uppercase tracking-wide">
-                <span className="text-[#0055ff]">For ({scoreFor})</span>
+                <span className="text-[#0055ff]">For ({percentageFor}%)</span>
                 <span>Eureka Evaluation</span>
-                <span className="text-[#ff5500]">Against ({scoreAgainst})</span>
+                <span className="text-[#ff5500]">Against ({percentageAgainst}%)</span>
             </div>
             <div className="h-2 w-full rounded-full bg-gray-200 overflow-hidden flex">
                 <div
