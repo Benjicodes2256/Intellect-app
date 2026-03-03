@@ -75,6 +75,11 @@ export async function POST(req: Request) {
                - List 1-2 bullet points for the strongest AGAINST argument.
                - Conclude with a final 1-sentence verdict on the overarching logical consensus.
             
+            Critical Judging Rules:
+            1. DO NOT judge based on the number of "FOR" or "AGAINST" points/arguments. Judge strictly on the logical merit and factual content of the arguments themselves. A side with many fluffy arguments should lose to a side with fewer, stronger arguments.
+            2. DO NOT give advice or suggestions on how an argument could have been better or how the users could improve.
+            3. Your conclusions and judgements MUST be based exclusively on the arguments posted. DO NOT inject your own personal views, outside facts not mentioned by users, or personal opinions on the debate in the summary and conclusion.
+            
             Formatting Rules:
             - Use standard English punctuation.
             - DO NOT use excessive Markdown flourishes like "***" or "...".
