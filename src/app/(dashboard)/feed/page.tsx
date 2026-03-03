@@ -4,6 +4,8 @@ import CreatePostForm from './components/CreatePostForm'
 import FeedPostCard from './components/FeedPostCard'
 import { redirect } from 'next/navigation'
 
+export const dynamic = 'force-dynamic'
+
 export default async function FeedPage() {
     const { userId, getToken } = await auth()
 

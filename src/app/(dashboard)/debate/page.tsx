@@ -7,6 +7,8 @@ import { createSupabaseClient } from '@/lib/supabase/client'
 import CreateDebateButton from './components/CreateDebateModal'
 import DeleteDebateButton from './components/DeleteDebateButton'
 
+export const dynamic = 'force-dynamic'
+
 function DebateBar({ scoreFor, scoreAgainst }: { scoreFor: number, scoreAgainst: number }) {
     const total = scoreFor + scoreAgainst;
     const percentageFor = total === 0 ? 50 : (scoreFor / total) * 100;

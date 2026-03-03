@@ -9,6 +9,8 @@ import CreateCommentForm from './components/CreateCommentForm'
 import DebateCommentActions from './components/DebateCommentActions'
 import CloseDebateButton from './components/CloseDebateButton'
 
+export const dynamic = 'force-dynamic'
+
 export default async function DebateThreadPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
     const { userId, getToken } = await auth()
