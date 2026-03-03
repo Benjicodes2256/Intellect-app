@@ -64,7 +64,7 @@ export default function CreateCommentForm({ debateId }: { debateId: string }) {
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                         placeholder="State your argument..."
-                        className="w-full bg-gray-100/80 border border-gray-200 focus:border-[#0055ff]/40 rounded-full px-4 py-2 pr-10 text-sm outline-none transition-colors"
+                        className="w-full bg-gray-100/80 border border-gray-200 focus:border-[#0055ff]/40 rounded-full px-4 py-2 pr-10 text-sm placeholder-gray-500 text-gray-900 outline-none transition-colors"
                         disabled={isSubmitting}
                         required
                         autoComplete="off"

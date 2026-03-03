@@ -83,7 +83,7 @@ export default function InlineDebateReplyForm({ debateId, parentId, parentAuthor
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                         placeholder="State your counterargument..."
-                        className="w-full bg-white border border-gray-200 rounded-full px-3 py-1.5 pr-8 focus:ring-2 focus:ring-[#0055ff]/20 focus:border-[#0055ff] outline-none text-xs transition-all"
+                        className="w-full bg-white border border-gray-200 rounded-full px-3 py-1.5 pr-8 focus:ring-2 focus:ring-[#0055ff]/20 focus:border-[#0055ff] placeholder-gray-500 text-gray-900 outline-none text-xs transition-all"
                         disabled={isSubmitting}
                         required
                         autoFocus
