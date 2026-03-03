@@ -79,7 +79,10 @@ function DebateTile({ debate, isOwner }: { debate: any, isOwner: boolean }) {
                 <Users size={14} /> {debate.comments?.length || 0} Participants • Created by {debate.users?.clerk_username || 'Unknown User'}
             </div>
 
-            <DebateBar scoreFor={debate.eureka_score_for || 0} scoreAgainst={debate.eureka_score_against || 0} />
+            <DebateBar
+                scoreFor={debate.comments?.filter((c: any) => c.stance === 'for').length || 0}
+                scoreAgainst={debate.comments?.filter((c: any) => c.stance === 'against').length || 0}
+            />
 
             <div className="mt-4 flex justify-end">
                 <Link
@@ -106,7 +109,7 @@ export default async function DebatePage() {
     // Fetch real debates from Supabase with creator's username and comment count
     const { data: debates, error } = await supabase
         .from('debates')
-        .select('*, users!debates_creator_id_fkey(clerk_username), comments(id)')
+        .select('*, users!debates_creator_id_fkey(clerk_username), comments(id, stance)')
         .order('created_at', { ascending: false })
 
     return (
