@@ -2,20 +2,19 @@
 
 import { useState } from 'react'
 import { MessageSquareText, Share2, MessageCircleReply } from 'lucide-react'
-import { clsx } from 'clsx'
 import LikePostButton from './LikePostButton'
 import DeletePostButton from './DeletePostButton'
 import InlineCommentForm from './InlineCommentForm'
 import LikeButton from '../../debate/[id]/components/LikeButton'
 import DeletePostCommentButton from './DeletePostCommentButton'
+import RichText from '@/components/ui/RichText'
 
 export default function FeedPostCard({ post, currentUserId }: { post: any, currentUserId: string }) {
     const [showComments, setShowComments] = useState(false)
     const [expanded, setExpanded] = useState(false)
 
     const comments = post.comments || []
-    // Sort ascending for chronological thread
-    const sortedComments = [...comments].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+    const sortedComments = [...comments].sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
 
     const isLong = post.content.length > 200
 
@@ -26,47 +25,67 @@ export default function FeedPostCard({ post, currentUserId }: { post: any, curre
         window.dispatchEvent(event)
     }
 
+    const isEureka = post.is_eureka_summary
+
     return (
-        <div className={clsx(
-            "bg-white rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border p-4 transition-all",
-            post.is_eureka_summary ? "border-[#ff5500]/30 bg-[#ff5500]/5" : "border-gray-100"
-        )}>
-            <div className="flex justify-between items-start mb-2">
-                <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#0055ff] to-[#ff5500] flex items-center justify-center text-white font-bold text-xs uppercase">
-                        {post.users?.clerk_username?.charAt(0) || '?'}
+        <div style={{
+            background: isEureka ? 'rgba(196,88,42,0.04)' : 'var(--card)',
+            border: `1px solid ${isEureka ? 'rgba(196,88,42,0.25)' : 'var(--bdr)'}`,
+            borderRadius: '2px',
+            padding: '1rem',
+            transition: 'border-color 0.2s',
+        }}>
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.6rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                    {/* Avatar */}
+                    <div style={{
+                        width: 32, height: 32, borderRadius: '50%',
+                        background: isEureka
+                            ? 'linear-gradient(135deg, var(--rust), var(--gold))'
+                            : 'linear-gradient(135deg, var(--violet), var(--rust))',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        color: '#fff', fontWeight: 700, fontSize: '0.65rem', textTransform: 'uppercase',
+                        flexShrink: 0,
+                    }}>
+                        {isEureka ? 'E' : (post.users?.clerk_username?.charAt(0) || '?')}
                     </div>
                     <div>
-                        <div className="font-bold text-sm text-gray-900 flex items-center gap-1">
-                            {post.users?.clerk_username || 'Unknown User'}
-                            {post.is_eureka_summary && <span className="bg-[#ff5500] text-white text-[10px] px-1.5 py-0.5 rounded-sm font-bold">AI Summary</span>}
-                            {post.users?.role === 'admin' && <span className="bg-[#0055ff] text-white text-[10px] px-1.5 py-0.5 rounded-sm font-bold">Admin</span>}
+                        <div style={{ fontWeight: 700, fontSize: '0.8rem', color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                            {isEureka ? 'Eureka' : (post.users?.clerk_username || 'Unknown User')}
+                            {isEureka && (
+                                <span style={{ background: 'var(--rust)', color: '#fff', fontSize: '0.44rem', padding: '0.15rem 0.4rem', borderRadius: '2px', fontFamily: "'DM Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase' }}>AI Summary</span>
+                            )}
+                            {!isEureka && post.users?.role === 'admin' && (
+                                <span style={{ background: 'var(--violet)', color: '#fff', fontSize: '0.44rem', padding: '0.15rem 0.4rem', borderRadius: '2px', fontFamily: "'DM Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase' }}>Admin</span>
+                            )}
                         </div>
-                        <div className="text-xs text-gray-400">
+                        <div style={{ fontSize: '0.6rem', color: 'var(--sub)', fontFamily: "'DM Mono', monospace" }}>
                             {new Date(post.created_at).toLocaleDateString()}
                         </div>
                     </div>
                 </div>
-
-                {currentUserId === post.author_id && (
-                    <DeletePostButton postId={post.id} />
-                )}
+                {currentUserId === post.author_id && <DeletePostButton postId={post.id} />}
             </div>
 
-            <div className="mt-3 text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
-                {expanded || !isLong ? post.content : `${post.content.substring(0, 200)}...`}
-
+            {/* Content */}
+            <div style={{ marginTop: '0.75rem' }}>
+                {expanded || !isLong
+                    ? <RichText content={post.content} />
+                    : <RichText content={`${post.content.substring(0, 200)}...`} />
+                }
                 {isLong && (
                     <button
                         onClick={() => setExpanded(!expanded)}
-                        className="text-[#0055ff] font-semibold text-xs mt-1 block hover:underline"
+                        style={{ color: 'var(--gold)', fontWeight: 600, fontSize: '0.72rem', marginTop: '0.3rem', display: 'block', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                     >
                         {expanded ? 'Show less' : 'Read more'}
                     </button>
                 )}
             </div>
 
-            <div className="mt-4 pt-3 border-t border-gray-100 flex items-center gap-6">
+            {/* Action Bar */}
+            <div style={{ marginTop: '0.85rem', paddingTop: '0.65rem', borderTop: '1px solid var(--bdr)', display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
                 <LikePostButton
                     postId={post.id}
                     initialLikes={post.likes?.length || 0}
@@ -75,58 +94,79 @@ export default function FeedPostCard({ post, currentUserId }: { post: any, curre
 
                 <button
                     onClick={() => setShowComments(!showComments)}
-                    className={clsx(
-                        "flex items-center gap-1.5 text-xs font-semibold transition-colors",
-                        showComments ? "text-[#0055ff]" : "text-gray-500 hover:text-[#0055ff]"
-                    )}
+                    style={{
+                        display: 'flex', alignItems: 'center', gap: '0.35rem',
+                        fontSize: '0.7rem', fontWeight: 600, fontFamily: "'DM Mono', monospace",
+                        color: showComments ? 'var(--gold)' : 'var(--sub)',
+                        background: 'none', border: 'none', cursor: 'pointer', letterSpacing: '0.04em',
+                        transition: 'color 0.2s',
+                    }}
                 >
-                    <MessageSquareText size={18} />
+                    <MessageSquareText size={16} />
                     {comments.length} {comments.length === 1 ? 'Comment' : 'Comments'}
                 </button>
 
-                <button className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-green-600 transition-colors ml-auto pointer-events-none opacity-50">
-                    <Share2 size={18} />
+                <button
+                    style={{
+                        display: 'flex', alignItems: 'center', gap: '0.35rem',
+                        fontSize: '0.7rem', fontWeight: 600, fontFamily: "'DM Mono', monospace",
+                        color: 'var(--sub)', background: 'none', border: 'none',
+                        marginLeft: 'auto', opacity: 0.4, cursor: 'default',
+                    }}
+                >
+                    <Share2 size={16} />
                     Share
                 </button>
             </div>
 
+            {/* Comments Section */}
             {showComments && (
-                <div className="mt-4 pt-4 border-t-2 border-dashed border-gray-100 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div style={{ marginTop: '0.85rem', paddingTop: '0.85rem', borderTop: '1px dashed var(--bdr)' }}>
                     {sortedComments.length === 0 && (
-                        <div className="text-center text-xs text-gray-500 py-3 bg-gray-50 rounded-xl mb-4 border border-gray-100 font-medium">
+                        <div style={{ textAlign: 'center', fontSize: '0.7rem', color: 'var(--sub)', padding: '0.75rem', background: 'var(--surf)', borderRadius: '2px', marginBottom: '0.75rem', border: '1px solid var(--bdr)' }}>
                             No responses yet. Be the first to add to the discussion!
                         </div>
                     )}
 
-                    <div className="space-y-3">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                         {sortedComments.map((comment: any) => (
-                            <div key={comment.id} className="bg-gray-50/80 rounded-xl p-3 relative text-sm border border-gray-100">
-
+                            <div key={comment.id} style={{
+                                background: 'var(--surf)', borderRadius: '2px', padding: '0.65rem',
+                                border: '1px solid var(--bdr)', fontSize: '0.8rem', position: 'relative',
+                            }}>
+                                {/* Quoted reply */}
                                 {comment.parent_id && (
-                                    <div className="flex flex-col bg-black/5 mx-[-12px] mt-[-12px] mb-2 px-3 py-1.5 border-l-2 border-[#0055ff] border-b border-gray-100">
-                                        <div className="text-[10px] font-bold text-[#0055ff]">
+                                    <div style={{
+                                        display: 'flex', flexDirection: 'column',
+                                        background: 'rgba(0,0,0,0.2)',
+                                        margin: '-0.65rem -0.65rem 0.5rem -0.65rem',
+                                        padding: '0.4rem 0.65rem',
+                                        borderLeft: '2px solid var(--violet-lt)',
+                                        borderBottom: '1px solid var(--bdr)',
+                                    }}>
+                                        <div style={{ fontSize: '0.55rem', fontWeight: 700, color: 'var(--violet-lt)', fontFamily: "'DM Mono', monospace" }}>
                                             {sortedComments.find((c: any) => c.id === comment.parent_id)?.users?.clerk_username || 'Participant'}
                                         </div>
-                                        <div className="text-[10px] text-gray-600 truncate mt-0.5 opacity-80">
+                                        <div style={{ fontSize: '0.6rem', color: 'var(--sub)', marginTop: '0.1rem', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
                                             {sortedComments.find((c: any) => c.id === comment.parent_id)?.content || 'Original message removed'}
                                         </div>
                                     </div>
                                 )}
 
-                                <div className="flex justify-between items-start mb-1">
-                                    <div className="font-bold flex items-center gap-2">
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.25rem' }}>
+                                    <div style={{ fontWeight: 700, fontSize: '0.75rem', color: 'var(--text)' }}>
                                         {comment.users?.clerk_username || 'Unknown User'}
                                     </div>
-                                    <div className="text-[10px] text-gray-400 font-medium">
+                                    <div style={{ fontSize: '0.55rem', color: 'var(--sub)', fontFamily: "'DM Mono', monospace" }}>
                                         {new Date(comment.created_at).toLocaleDateString()}
                                     </div>
                                 </div>
 
-                                <div className="text-gray-800 leading-snug mb-2">
-                                    {comment.content}
+                                <div style={{ color: 'var(--text)', marginBottom: '0.4rem' }}>
+                                    <RichText content={comment.content} small />
                                 </div>
 
-                                <div className="flex flex-wrap items-center gap-3 mt-1 border-t border-gray-100/50 pt-2">
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', borderTop: '1px solid var(--bdr)', paddingTop: '0.35rem', marginTop: '0.1rem' }}>
                                     <LikeButton
                                         commentId={comment.id}
                                         initialLikes={comment.likes?.length || 0}
@@ -135,17 +175,20 @@ export default function FeedPostCard({ post, currentUserId }: { post: any, curre
 
                                     <button
                                         onClick={() => handleReplyClick(comment.id, comment.users?.clerk_username || 'Unknown User', comment.content)}
-                                        className="flex items-center gap-1 text-[11px] font-bold text-gray-400 hover:text-[#0055ff] transition-colors uppercase tracking-wider"
+                                        style={{
+                                            display: 'flex', alignItems: 'center', gap: '0.25rem',
+                                            fontSize: '0.55rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
+                                            fontFamily: "'DM Mono', monospace", color: 'var(--sub)', background: 'none', border: 'none',
+                                            cursor: 'pointer', transition: 'color 0.2s',
+                                        }}
                                     >
-                                        <MessageCircleReply size={14} />
+                                        <MessageCircleReply size={13} />
                                         Reply
                                     </button>
 
                                     {currentUserId === comment.author_id && (
-                                        <div className="ml-auto">
-                                            <DeletePostCommentButton
-                                                commentId={comment.id}
-                                            />
+                                        <div style={{ marginLeft: 'auto' }}>
+                                            <DeletePostCommentButton commentId={comment.id} />
                                         </div>
                                     )}
                                 </div>

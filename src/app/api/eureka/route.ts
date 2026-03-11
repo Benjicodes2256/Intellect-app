@@ -91,11 +91,16 @@ export async function POST(req: Request) {
 
             try {
                 const response = await ai.models.generateContent({
-                    model: 'gemini-2.5-flash',
+                    model: 'gemini-1.5-flash',
                     contents: prompt,
                 })
-                summaryText = response.text || "Eureka experienced an unknown API failure."
-                console.log(`[EUREKA] Successfully generated Summary.`);
+                const raw = response.text?.trim() || ''
+                if (raw.length < 50) {
+                    summaryText = `Eureka attempted to summarise this debate but received an incomplete response from the AI. The debate has been closed — check back later.`
+                } else {
+                    summaryText = raw
+                }
+                console.log(`[EUREKA] Successfully generated Summary (${raw.length} chars).`);
             } catch (apiError: any) {
                 console.error("[EUREKA] Rate Limit / API Error:", apiError)
                 summaryText = `Eureka encountered a Google API Error: ${apiError?.message || JSON.stringify(apiError)}`
@@ -107,7 +112,7 @@ export async function POST(req: Request) {
         // 3. Insert the summary as a public feed post flagged as AI
         const { error: insertError } = await supabase.from('posts').insert({
             author_id: closingUserId,
-            content: `**[Debate Concluded: ${debate.topic}]**\n\n${summaryText}`,
+            content: `**Debate Concluded — ${debate.topic}**\n\n${summaryText}`,
             is_eureka_summary: true
         })
 
