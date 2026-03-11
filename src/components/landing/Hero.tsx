@@ -52,52 +52,6 @@ export default function Hero() {
         AI-powered insights. Real stakes. No echo chambers.
       </p>
 
-      {/* Stats */}
-      <div
-        className="anim-3"
-        style={{
-          display: 'flex',
-          marginTop: '1.5rem',
-          paddingTop: '1.2rem',
-          borderTop: '1px solid var(--bdr)',
-        }}
-      >
-        {[
-          { num: '12.4K', label: 'Debaters' },
-          { num: '847', label: 'Live Now' },
-          { num: '3.2M', label: 'Arguments' },
-        ].map((s, i) => (
-          <div
-            key={s.label}
-            style={{
-              flex: 1,
-              paddingRight: i < 2 ? '1rem' : 0,
-              paddingLeft: i > 0 ? '1rem' : 0,
-              borderRight: i < 2 ? '1px solid var(--bdr)' : 'none',
-            }}
-          >
-            <div style={{
-              fontFamily: "'Playfair Display', serif",
-              fontWeight: 700,
-              fontSize: '1.5rem',
-              color: 'var(--gold)',
-              lineHeight: 1,
-            }}>
-              {s.num}
-            </div>
-            <div style={{
-              fontSize: '0.54rem',
-              fontWeight: 500,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              color: 'var(--sub)',
-              marginTop: '0.1rem',
-            }}>
-              {s.label}
-            </div>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

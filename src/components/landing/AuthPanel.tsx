@@ -10,28 +10,7 @@ export default function AuthPanel({ redirectUrl }: AuthPanelProps) {
         gap: '0.75rem',
       }}
     >
-      {/* Heading */}
-      <div style={{ marginBottom: '0.1rem' }}>
-        <h2 style={{
-          fontFamily: "'Playfair Display', serif",
-          fontSize: '1.45rem',
-          fontWeight: 700,
-          fontStyle: 'italic',
-          color: 'var(--text)',
-          lineHeight: 1,
-        }}>
-          Enter the Arena
-        </h2>
-        <p style={{
-          fontSize: '0.64rem',
-          fontWeight: 300,
-          color: 'var(--sub)',
-          marginTop: '0.22rem',
-          letterSpacing: '0.04em',
-        }}>
-          Great minds discuss, debate &amp; appreciate
-        </p>
-      </div>
+
 
       {/* Clerk SignIn — appearance customised to match Version B palette */}
       <SignIn
