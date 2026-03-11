@@ -5,14 +5,9 @@ interface AuthPanelProps { redirectUrl?: string; }
 export default function AuthPanel({ redirectUrl }: AuthPanelProps) {
   return (
     <div
-      className="anim-4"
+      className="anim-4 landing-auth"
       style={{
-        padding: '0 2rem 0 2.5rem',
-        display: 'flex',
-        flexDirection: 'column',
         gap: '0.75rem',
-        height: '100%',
-        justifyContent: 'center',
       }}
     >
       {/* Heading */}

@@ -21,20 +21,8 @@ export default async function LandingPage({
       {/* Fixed header */}
       <Navbar />
 
-      {/* Main 2-col layout */}
-      <main
-        style={{
-          position: 'relative',
-          zIndex: 2,
-          height: '100vh',
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1.05fr) minmax(0, 0.95fr)',
-          alignItems: 'center',
-          padding: '52px 0 66px',
-          maxWidth: '1100px',
-          margin: '0 auto',
-        }}
-      >
+      {/* Main layout — responsive via CSS class */}
+      <main className="landing-main">
         <Hero />
         <AuthPanel redirectUrl={invite} />
       </main>

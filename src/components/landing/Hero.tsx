@@ -1,16 +1,6 @@
 export default function Hero() {
   return (
-    <div
-      className="anim-col-hero"
-      style={{
-        padding: '0 2.5rem 0 2rem',
-        borderRight: '1px solid var(--bdr)',
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        justifyContent: 'center',
-      }}
-    >
+    <div className="anim-col-hero landing-hero">
       {/* Eyebrow */}
       <div
         className="anim-0"
@@ -32,12 +22,10 @@ export default function Hero() {
 
       {/* Headline */}
       <h1
-        className="anim-1"
+        className="anim-1 landing-headline"
         style={{
           fontFamily: "'Playfair Display', serif",
-          fontSize: 'clamp(2.8rem, 4.2vw, 5rem)',
           fontWeight: 900,
-          lineHeight: 0.93,
           letterSpacing: '-0.01em',
           color: 'var(--text)',
         }}
@@ -76,8 +64,8 @@ export default function Hero() {
       >
         {[
           { num: '12.4K', label: 'Debaters' },
-          { num: '847',   label: 'Live Now' },
-          { num: '3.2M',  label: 'Arguments' },
+          { num: '847', label: 'Live Now' },
+          { num: '3.2M', label: 'Arguments' },
         ].map((s, i) => (
           <div
             key={s.label}
