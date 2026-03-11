@@ -5,6 +5,7 @@ import { createSupabaseClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import OnboardingTour from '@/components/layout/OnboardingTour'
 import ThemeToggle from '@/components/layout/ThemeToggle'
+import { calculateReputationTier } from '@/lib/reputation'
 
 export default async function DashboardLayout({
     children,
@@ -22,7 +23,7 @@ export default async function DashboardLayout({
 
     const { data: userData } = await supabase
         .from('users')
-        .select('role, has_completed_onboarding')
+        .select('role, has_completed_onboarding, reputation_score, tier_demotions')
         .eq('clerk_id', userId)
         .single()
 
@@ -97,7 +98,7 @@ export default async function DashboardLayout({
                             borderRadius: '2px',
                             background: 'var(--surf)',
                         }}>
-                            Apprentice
+                            {calculateReputationTier(userData?.reputation_score, userData?.tier_demotions).tierName}
                         </div>
                         <ThemeToggle />
                     </div>

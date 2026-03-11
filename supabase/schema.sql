@@ -8,6 +8,8 @@ create table public.users (
   clerk_username text,
   email text,
   reputation_score integer default 0,
+  tier_demotions integer default 0,
+  last_active_at timestamptz default now(),
   truth_score integer default 100,
   agreed_to_charter boolean default false,
   role text default 'user', -- 'admin' for adminme

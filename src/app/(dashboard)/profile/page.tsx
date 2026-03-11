@@ -1,30 +1,38 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { User, MapPin, Briefcase, Award, ShieldAlert, Send } from 'lucide-react'
 import { useUser, SignOutButton } from '@clerk/nextjs'
-import { submitSuggestionAction } from './actions'
-
-const REPUTATION_TIERS = ['Apprentice', 'Rookie', 'Pro', 'Scholar', 'Einstein']
+import { submitSuggestionAction, fetchUserProfileMetricsAction } from './actions'
+import ReputationModal from './components/ReputationModal'
+import { REPUTATION_TIERS } from '@/lib/reputation'
 
 export default function ProfilePage() {
     const { isLoaded, user } = useUser()
     const [suggestion, setSuggestion] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [metrics, setMetrics] = useState<any>(null)
+    const [isLoadingMetrics, setIsLoadingMetrics] = useState(true)
 
-    if (!isLoaded || !user) {
+    useEffect(() => {
+        if (isLoaded && user) {
+            fetchUserProfileMetricsAction().then((data) => {
+                setMetrics(data)
+                setIsLoadingMetrics(false)
+            }).catch((err) => {
+                console.error(err)
+                setIsLoadingMetrics(false)
+            })
+        }
+    }, [isLoaded, user])
+
+    if (!isLoaded || !user || isLoadingMetrics) {
         return (
             <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--sub)', fontFamily: "'DM Mono', monospace", fontSize: '0.7rem', letterSpacing: '0.08em' }}>
                 Loading profile...
             </div>
         )
-    }
-
-    const mockDbUser = {
-        reputationScore: 45,
-        truthScore: 98,
-        tier: REPUTATION_TIERS[1],
-        nextTierTarget: 100,
     }
 
     const handleSuggestionSubmit = async (e: React.FormEvent) => {
@@ -41,8 +49,6 @@ export default function ProfilePage() {
             setIsSubmitting(false)
         }
     }
-
-    const progressPercentage = (mockDbUser.reputationScore / mockDbUser.nextTierTarget) * 100
 
     return (
         <div>
@@ -114,39 +120,46 @@ export default function ProfilePage() {
                 {/* Reputation Metrics */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', paddingTop: '1rem', borderTop: '1px solid var(--bdr)' }}>
                     {/* Reputation Tier */}
-                    <div style={{ background: 'rgba(106,76,147,0.08)', padding: '0.85rem', borderRadius: '2px', border: '1px solid rgba(106,76,147,0.2)' }}>
+                    <button
+                        onClick={() => setIsModalOpen(true)}
+                        style={{ textAlign: 'left', background: 'rgba(106,76,147,0.08)', padding: '0.85rem', borderRadius: '2px', border: '1px solid rgba(106,76,147,0.2)', cursor: 'pointer', transition: 'background 0.2s' }}
+                        onMouseOver={(e) => e.currentTarget.style.background = 'rgba(106,76,147,0.12)'}
+                        onMouseOut={(e) => e.currentTarget.style.background = 'rgba(106,76,147,0.08)'}
+                    >
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                             <span style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.46rem', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--violet-lt)' }}>Reputation Tier</span>
                             <Award size={14} style={{ color: 'var(--violet-lt)' }} />
                         </div>
                         <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.4rem', fontWeight: 900, color: 'var(--text)' }}>
-                            {mockDbUser.tier}
+                            {metrics?.calculatedTier?.tierName || 'Observer'}
                         </div>
                         <div style={{ marginTop: '0.5rem' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: "'DM Mono', monospace", fontSize: '0.44rem', color: 'var(--sub)', marginBottom: '0.3rem' }}>
-                                <span>{mockDbUser.reputationScore} PTS</span>
-                                <span>{mockDbUser.nextTierTarget} TO NEXT</span>
+                                <span>{metrics?.calculatedTier?.reputationScore || 0} PTS</span>
+                                <span>{metrics?.calculatedTier?.isMax ? 'MAX TIER' : `${metrics?.calculatedTier?.pointsToNext || 0} TO NEXT`}</span>
                             </div>
                             <div style={{ width: '100%', background: 'var(--bdr)', borderRadius: '1px', height: '3px', overflow: 'hidden' }}>
-                                <div style={{ background: 'var(--violet)', height: '100%', width: `${progressPercentage}%`, transition: 'width 0.5s' }} />
+                                <div style={{ background: 'var(--violet)', height: '100%', width: `${metrics?.calculatedTier?.progressPercentage || 0}%`, transition: 'width 0.5s' }} />
                             </div>
                             <p style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.46rem', color: 'var(--sub)', marginTop: '0.4rem', fontStyle: 'italic', lineHeight: 1.5 }}>
-                                "One more verified fact-check and you'll reach {REPUTATION_TIERS[2]} status."
+                                {metrics?.calculatedTier?.isMax
+                                    ? "You have reached the Zenith."
+                                    : `"Keep commenting to reach ${REPUTATION_TIERS[(metrics?.calculatedTier?.tierIndex || 0) + 1]} status."`}
                             </p>
                         </div>
-                    </div>
+                    </button>
 
                     {/* Truth Score */}
-                    <div style={{ background: 'rgba(196,88,42,0.08)', padding: '0.85rem', borderRadius: '2px', border: '1px solid rgba(196,88,42,0.2)' }}>
+                    <div style={{ background: 'rgba(196,88,42,0.08)', padding: '0.85rem', borderRadius: '2px', border: '1px solid rgba(196,88,42,0.2)', opacity: 0.6 }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                             <span style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.46rem', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--rust)' }}>Truth Score</span>
                             <ShieldAlert size={14} style={{ color: 'var(--rust)' }} />
                         </div>
-                        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.4rem', fontWeight: 900, color: 'var(--text)' }}>
-                            {mockDbUser.truthScore}%
+                        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.4rem', fontWeight: 900, color: 'var(--text)', display: 'flex', alignItems: 'center' }}>
+                            <span style={{ fontSize: '0.7rem', fontFamily: "'DM Mono', monospace", letterSpacing: '0.1em', color: 'var(--rust)' }}>[COMING SOON]</span>
                         </div>
                         <p style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.46rem', color: 'var(--sub)', marginTop: '0.5rem', lineHeight: 1.6 }}>
-                            Posting unverified claims lowers this. Drops below 80% restrict your ability to start Master Debates.
+                            The Eureka AI will soon begin evaluating logical consistency to form your Truth Score.
                         </p>
                     </div>
                 </div>
@@ -215,6 +228,17 @@ export default function ProfilePage() {
                     </button>
                 </div>
             </form>
+
+            {metrics && (
+                <ReputationModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    currentTierIndex={metrics.calculatedTier.tierIndex}
+                    reputationScore={metrics.calculatedTier.reputationScore}
+                    nextTierTarget={metrics.calculatedTier.nextTierTarget}
+                    tierDemotions={metrics.calculatedTier.tierDemotions}
+                />
+            )}
         </div>
     )
 }

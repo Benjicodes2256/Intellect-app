@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server"
 import { createSupabaseClient } from "@/lib/supabase/client"
 import { revalidatePath } from "next/cache"
 import { GoogleGenAI } from '@google/genai'
+import { incrementUserReputation } from "@/lib/reputation-server"
 
 export async function createCommentAction(
     debateId: string,
@@ -47,6 +48,7 @@ export async function createCommentAction(
         return { error: "Failed to post comment. Please try again." }
     }
 
+    await incrementUserReputation(supabase, userId)
     revalidatePath(`/debate/${debateId}`)
     return { success: true }
 }

@@ -3,6 +3,7 @@
 import { auth } from "@clerk/nextjs/server"
 import { createSupabaseClient } from "@/lib/supabase/client"
 import { revalidatePath } from "next/cache"
+import { incrementUserReputation } from "@/lib/reputation-server"
 
 export async function createDebateAction(topic: string, timeframeDays: number, introduction?: string, isPrivate: boolean = false) {
     const { userId, getToken } = await auth()
@@ -45,6 +46,7 @@ export async function createDebateAction(topic: string, timeframeDays: number, i
         throw new Error("Failed to create debate. Please try again.")
     }
 
+    await incrementUserReputation(supabase, userId)
     revalidatePath("/debate")
 }
 

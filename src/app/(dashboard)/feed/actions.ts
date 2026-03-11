@@ -3,6 +3,7 @@
 import { auth } from "@clerk/nextjs/server"
 import { createSupabaseClient } from "@/lib/supabase/client"
 import { revalidatePath } from "next/cache"
+import { incrementUserReputation } from "@/lib/reputation-server"
 
 export async function createPostAction(content: string) {
     const { userId, getToken } = await auth()
@@ -32,6 +33,7 @@ export async function createPostAction(content: string) {
         throw new Error("Failed to create post. Please try again.")
     }
 
+    await incrementUserReputation(supabase, userId)
     revalidatePath("/feed")
 }
 
@@ -138,6 +140,7 @@ export async function createPostCommentAction(
         throw new Error("Failed to post comment. Please try again.")
     }
 
+    await incrementUserReputation(supabase, userId)
     revalidatePath(`/feed`)
 }
 
