@@ -7,6 +7,7 @@ import { notFound } from 'next/navigation'
 import CreateCommentForm from './components/CreateCommentForm'
 import DebateCommentActions from './components/DebateCommentActions'
 import CloseDebateButton from './components/CloseDebateButton'
+import ReopenDebateButton from './components/ReopenDebateButton'
 import InviteButton from '@/components/debate/InviteButton'
 import RichText from '@/components/ui/RichText'
 
@@ -40,6 +41,13 @@ export default async function DebateThreadPage({ params }: { params: Promise<{ i
     const diffTime = closesAt.getTime() - now.getTime()
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
     const isClosed = debate.is_closed || diffDays <= 0
+
+    // Fetch user role to check if admin
+    const { data: userData } = await supabase
+        .from('users')
+        .select('role')
+        .eq('clerk_id', userId)
+        .single()
 
     const forComments = comments?.filter(c => c.stance === 'for').length || 0
     const againstComments = comments?.filter(c => c.stance === 'against').length || 0

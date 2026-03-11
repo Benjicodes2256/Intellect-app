@@ -93,3 +93,25 @@ export async function deletePostAdminAction(postId: string) {
     }
     revalidatePath('/admin')
 }
+
+export async function reopenDebateAdminAction(debateId: string) {
+    const supabase = await verifyAdmin()
+
+    // 1. Reopen the debate
+    const { error: updateError } = await supabase
+        .from('debates').update({ is_closed: false }).eq('id', debateId)
+
+    if (updateError) {
+        console.error('Error reopening debate:', updateError.message)
+        return { error: 'Failed to reopen debate.' }
+    }
+
+    // 2. Clear out the previous Eureka summary comment
+    await supabase.from('comments')
+        .delete()
+        .eq('debate_id', debateId)
+        .eq('stance', 'neutral')
+
+    revalidatePath(`/debate/${debateId}`)
+    return { success: true }
+}
