@@ -7,38 +7,41 @@ import { revalidatePath } from "next/cache"
 export async function createDebateAction(topic: string, timeframeDays: number, introduction?: string) {
     const { userId, getToken } = await auth()
 
-    if (!userId) {
-        throw new Error("Must be logged in to create a debate.")
-    }
+    if (!userId) throw new Error("Authentication required.")
+
+    // §4 — Server-side content length validation
+    const trimmedTopic = topic?.trim() ?? ''
+    if (!trimmedTopic) throw new Error("Debate topic cannot be empty.")
+    if (trimmedTopic.length > 300) throw new Error("Topic is too long (max 300 characters).")
+
+    const trimmedIntro = introduction?.trim() ?? ''
+    if (trimmedIntro.length > 2000) throw new Error("Introduction is too long (max 2000 characters).")
 
     const token = await getToken({ template: "supabase" })
-    if (!token) throw new Error("Could not fetch auth token")
+    if (!token) throw new Error("Authentication required.")
 
     const supabase = createSupabaseClient(token)
 
-    // Calculate closure date. Standard timeframe logic.
     const closesAt = new Date()
     closesAt.setDate(closesAt.getDate() + timeframeDays)
 
     const insertData: any = {
         creator_id: userId,
-        topic,
+        topic: trimmedTopic,
         closes_at: closesAt.toISOString(),
         is_closed: false,
         duration_days: timeframeDays,
     }
 
-    if (introduction && introduction.trim() !== '') {
-        insertData.introduction = introduction.trim()
+    if (trimmedIntro !== '') {
+        insertData.introduction = trimmedIntro
     }
 
-    const { error } = await supabase
-        .from("debates")
-        .insert(insertData)
+    const { error } = await supabase.from("debates").insert(insertData)
 
     if (error) {
-        console.error("Error creating debate:", error)
-        throw new Error(error.message)
+        console.error("Error creating debate:", error.message)
+        throw new Error("Failed to create debate. Please try again.")
     }
 
     revalidatePath("/debate")
@@ -63,8 +66,8 @@ export async function deleteDebateAction(debateId: string) {
         .eq("creator_id", userId) // Enforce ownership check
 
     if (error) {
-        console.error("Error deleting debate:", error)
-        return { error: error.message }
+        console.error("Error deleting debate:", error.message)
+        return { error: "Failed to delete debate. Please try again." }
     }
 
     revalidatePath("/debate")

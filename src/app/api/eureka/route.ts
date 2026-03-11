@@ -2,63 +2,74 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { GoogleGenAI } from '@google/genai';
 
-// Initialize bare Google Gen AI SDK
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-// USE EDGE RUNTIME TO BYPASS 10-SECOND VERCEL NODE TIMEOUT
 export const runtime = 'edge';
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export async function POST(req: Request) {
     try {
         const body = await req.json();
         const { debateId, closingUserId } = body;
 
+        // §4 — Input validation: reject malformed IDs before touching the DB
         if (!debateId || !closingUserId) {
-            return NextResponse.json({ error: "Missing required parameters" }, { status: 400 });
+            return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+        }
+        if (!UUID_REGEX.test(debateId)) {
+            return NextResponse.json({ error: "Invalid request" }, { status: 400 });
         }
 
-        // We use the Service Role key here because the request is coming from our own server action
-        // in the background without an active user session token context in the edge function.
         const supabase = createClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
             process.env.SUPABASE_SERVICE_ROLE_KEY!,
             { auth: { persistSession: false } }
         );
 
-        console.log(`[EUREKA] Starting AI Summarization for debate: ${debateId}`);
+        // Fetch debate
+        const { data: debate, error: debateError } = await supabase
+            .from('debates').select('*').eq('id', debateId).single();
 
-        // 1. Fetch debate topic
-        const { data: debate, error: debateError } = await supabase.from('debates').select('*').eq('id', debateId).single()
         if (debateError || !debate) {
-            console.error(`[EUREKA] Debate fetch failed:`, debateError);
-            return NextResponse.json({ error: "Failed to fetch debate" }, { status: 500 });
+            return NextResponse.json({ error: "An internal error occurred" }, { status: 500 });
         }
 
-        // 2. Verify Authorization
+        // §5 — Rate limiting: reject if debate is already closed (prevents Gemini spam)
+        if (debate.is_closed) {
+            return NextResponse.json({ error: "Debate is already closed" }, { status: 409 });
+        }
+
+        // Verify authorisation
         if (debate.creator_id !== closingUserId) {
-            const { data: userData } = await supabase.from("users").select("role").eq("clerk_id", closingUserId).single()
+            const { data: userData } = await supabase
+                .from("users").select("role").eq("clerk_id", closingUserId).single();
             if (userData?.role !== 'admin') {
-                return NextResponse.json({ error: "Unauthorized: Only the creator can close this debate." }, { status: 403 });
+                return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
             }
         }
 
-        // 3. Fetch comments with user relations
-        const { data: comments, error: commentsError } = await supabase.from('comments').select('*, users(clerk_username)').eq('debate_id', debateId).order('created_at', { ascending: true })
+        // Fetch comments
+        const { data: comments, error: commentsError } = await supabase
+            .from('comments').select('*, users(clerk_username)')
+            .eq('debate_id', debateId).order('created_at', { ascending: true });
+
         if (commentsError) {
             console.error(`[EUREKA] Comments fetch failed:`, commentsError);
-            return NextResponse.json({ error: "Failed to fetch comments" }, { status: 500 });
+            return NextResponse.json({ error: "An internal error occurred" }, { status: 500 });
         }
 
-        let summaryText = ""
+        let summaryText = "";
 
         if (!comments || comments.length === 0) {
-            summaryText = "This debate was closed before any arguments were made."
+            summaryText = "This debate was closed before any arguments were made.";
         } else if (!process.env.GEMINI_API_KEY) {
-            summaryText = `Eureka experienced an environment error: GEMINI_API_KEY is undefined in this Edge runtime.`
+            summaryText = "Eureka could not generate a summary at this time. Please try again later.";
         } else {
-            console.log(`[EUREKA] Found ${comments.length} comments. Sending to Gemini...`);
+            const transcript = comments
+                .map((c: any) => `[${c.stance.toUpperCase()}] ${c.users?.clerk_username || 'Participant'}: ${c.content}`)
+                .join('\n');
 
-            const transcript = comments.map((c: any) => `[${c.stance.toUpperCase()}] ${c.users?.clerk_username || 'Participant'}: ${c.content}`).join('\n')
             const prompt = `
             You are Eureka, the AI Moderator. A debate has just concluded.
             Topic: "${debate.topic}"
@@ -76,9 +87,9 @@ export async function POST(req: Request) {
                - Conclude with a final 1-sentence verdict on the overarching logical consensus.
             
             Critical Judging Rules:
-            1. DO NOT judge based on the number of "FOR" or "AGAINST" points/arguments. Judge strictly on the logical merit and factual content of the arguments themselves. A side with many fluffy arguments should lose to a side with fewer, stronger arguments.
-            2. DO NOT give advice or suggestions on how an argument could have been better or how the users could improve.
-            3. Your conclusions and judgements MUST be based exclusively on the arguments posted. DO NOT inject your own personal views, outside facts not mentioned by users, or personal opinions on the debate in the summary and conclusion.
+            1. DO NOT judge based on the number of arguments. Judge strictly on logical merit.
+            2. DO NOT give advice on how arguments could be improved.
+            3. Base conclusions exclusively on the arguments posted.
             
             Formatting Rules:
             - Use standard English punctuation.
@@ -87,69 +98,63 @@ export async function POST(req: Request) {
             - Use bold text for main section headings, e.g. **The Verdict**.
             - Use italic text for subheadings or emphasis.
             - Use simple bullet points (-) for lists.
-            `
+            `;
 
             try {
                 const response = await ai.models.generateContent({
                     model: 'gemini-1.5-flash',
                     contents: prompt,
-                })
-                const raw = response.text?.trim() || ''
+                });
+                const raw = response.text?.trim() || '';
                 if (raw.length < 50) {
-                    summaryText = `Eureka attempted to summarise this debate but received an incomplete response from the AI. The debate has been closed — check back later.`
+                    summaryText = "Eureka attempted to summarise this debate but received an incomplete response. The debate has been closed.";
                 } else {
-                    summaryText = raw
+                    summaryText = raw;
                 }
-                console.log(`[EUREKA] Successfully generated Summary (${raw.length} chars).`);
             } catch (apiError: any) {
-                console.error("[EUREKA] Rate Limit / API Error:", apiError)
-                summaryText = `Eureka encountered a Google API Error: ${apiError?.message || JSON.stringify(apiError)}`
+                console.error("[EUREKA] Gemini API Error:", apiError?.message);
+                summaryText = "Eureka could not generate a summary at this time. The debate has been closed.";
             }
         }
 
-        console.log(`[EUREKA] Inserting posts to database (Author: ${closingUserId})...`);
-
-        // 3. Insert the summary as a public feed post flagged as AI
+        // Insert feed post
         const { error: insertError } = await supabase.from('posts').insert({
             author_id: closingUserId,
             content: `**Debate Concluded — ${debate.topic}**\n\n${summaryText}`,
             is_eureka_summary: true
-        })
+        });
 
         if (insertError) {
-            console.error("[EUREKA] Failed to insert feed post:", insertError)
-            return NextResponse.json({ error: "DB Feed Post Insert Failed" }, { status: 500 });
+            console.error("[EUREKA] Feed post insert failed:", insertError.message);
+            return NextResponse.json({ error: "An internal error occurred" }, { status: 500 });
         }
 
-        // 4. Insert the summary as a comment in the debate thread
+        // Insert debate thread comment
         const { error: commentInsertError } = await supabase.from('comments').insert({
             debate_id: debateId,
             author_id: closingUserId,
             content: `**[Eureka AI Summary]**\n${summaryText}`,
             stance: 'neutral',
-        })
+        });
 
         if (commentInsertError) {
-            console.error("[EUREKA] Failed to insert debate comment:", commentInsertError)
-            return NextResponse.json({ error: "DB Comment Insert Failed" }, { status: 500 });
+            console.error("[EUREKA] Comment insert failed:", commentInsertError.message);
+            return NextResponse.json({ error: "An internal error occurred" }, { status: 500 });
         }
 
-        // 5. Officially mark the debate as closed now that the AI Summary is posted
+        // Lock debate
         const { error: lockError } = await supabase
-            .from('debates')
-            .update({ is_closed: true })
-            .eq('id', debateId)
+            .from('debates').update({ is_closed: true }).eq('id', debateId);
 
         if (lockError) {
-            console.error("[EUREKA] Failed to lock debate:", lockError)
-            return NextResponse.json({ error: "Failed to cleanly lock debate" }, { status: 500 });
+            console.error("[EUREKA] Debate lock failed:", lockError.message);
+            return NextResponse.json({ error: "An internal error occurred" }, { status: 500 });
         }
 
-        console.log(`[EUREKA] Finished successfully! Debate ${debateId} locked.`);
         return NextResponse.json({ success: true });
 
     } catch (e: any) {
-        console.error("[EUREKA] Fatal Error:", e)
-        return NextResponse.json({ error: e.message || "Internal Server Error" }, { status: 500 });
+        console.error("[EUREKA] Fatal Error:", e?.message);
+        return NextResponse.json({ error: "An internal error occurred" }, { status: 500 });
     }
 }

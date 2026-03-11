@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── DESIGN TOKENS ── */
+:root {
+  --bg: #0f0d0b;
+  --bg2: #161310;
+  --card: #1c1915;
+  --surf: #242018;
+  --ivory: #f5f0e8;
+  --ivory-dim: #b8ad9a;
+  --violet: #6A4C93;
+  --violet-lt: #9b78cc;
+  --gold: #c9972a;
+  --rust: #c4582a;
+  --text: var(--ivory);
+  --sub: var(--ivory-dim);
+  --bdr: rgba(201, 151, 42, 0.14);
+  --bdr2: rgba(255, 255, 255, 0.06);
+  --glow: rgba(106, 76, 147, 0.22);
+}
+
+[data-theme='light'] {
+  --bg: #f7f4ed;
+  --bg2: #eeeae0;
+  --card: #ffffff;
+  --surf: #f0ece3;
+  --ivory: #1a1612;
+  --ivory-dim: #5a5040;
+  --violet: #5a3c83;
+  --violet-lt: #7a52b3;
+  --gold: #a87820;
+  --rust: #a83d18;
+  --bdr: rgba(168, 120, 32, 0.18);
+  --bdr2: rgba(0, 0, 0, 0.08);
+  --glow: rgba(90, 60, 131, 0.1);
+}
+
+/* ── BASE ── */
+html, body {
+  height: 100%;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ── GRAIN ── */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.032;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+[data-theme='light'] .grain { opacity: 0.02; }
+
+/* ── TICKER ANIMATION ── */
+@keyframes ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.ticker-scroll {
+  animation: ticker 24s linear infinite;
+}
+
+/* ── FADE UP ANIMATION ── */
+@keyframes fadeup {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.anim-0 { opacity: 0; animation: fadeup 0.5s 0.10s forwards; }
+.anim-1 { opacity: 0; animation: fadeup 0.5s 0.18s forwards; }
+.anim-2 { opacity: 0; animation: fadeup 0.5s 0.28s forwards; }
+.anim-3 { opacity: 0; animation: fadeup 0.5s 0.38s forwards; }
+.anim-4 { opacity: 0; animation: fadeup 0.5s 0.22s forwards; }
+
+/* ── BLINK ── */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}

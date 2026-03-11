@@ -13,48 +13,39 @@ export async function createCommentAction(
 ) {
     const { userId, getToken } = await auth()
 
-    if (!userId) {
-        throw new Error("Must be logged in to comment.")
-    }
+    if (!userId) throw new Error("Authentication required.")
+
+    // §4 — Server-side content length validation
+    const trimmed = content?.trim() ?? ''
+    if (!trimmed) return { error: "Comment cannot be empty." }
+    if (trimmed.length > 2000) return { error: "Comment is too long (max 2000 characters)." }
 
     const token = await getToken({ template: "supabase" })
-    if (!token) throw new Error("Could not fetch auth token")
+    if (!token) throw new Error("Authentication required.")
 
     const supabase = createSupabaseClient(token)
 
-    // 1. Check if debate is closed
     const { data: debateData, error: debateError } = await supabase
-        .from("debates")
-        .select("is_closed")
-        .eq("id", debateId)
-        .single()
+        .from("debates").select("is_closed").eq("id", debateId).single()
 
-    if (debateError || !debateData) return { error: "Debate not found" }
+    if (debateError || !debateData) return { error: "Debate not found." }
     if (debateData.is_closed) return { error: "This debate is already closed." }
 
-    // 2. Insert Comment Initial
     const payload: any = {
         debate_id: debateId,
         author_id: userId,
-        content,
+        content: trimmed,
         stance
     }
 
-    if (parentId) {
-        payload.parent_id = parentId
-    }
+    if (parentId) payload.parent_id = parentId
 
-    const { error: insertError } = await supabase
-        .from("comments")
-        .insert(payload)
+    const { error: insertError } = await supabase.from("comments").insert(payload)
 
     if (insertError) {
-        return { error: insertError.message }
+        console.error("Error inserting comment:", insertError.message)
+        return { error: "Failed to post comment. Please try again." }
     }
-
-    // 3. Fire-and-forget Eureka evaluation (Graceful Degradation)
-    // In a real app we'd use unawaited promises or queues here.
-    // We'll just revalidate so the comment shows up immediately.
 
     revalidatePath(`/debate/${debateId}`)
     return { success: true }
@@ -167,7 +158,8 @@ export async function deleteCommentAction(commentId: string, debateId: string) {
         .eq('author_id', userId)
 
     if (error) {
-        throw new Error(error.message)
+        console.error("Error deleting comment:", error.message)
+        throw new Error("Failed to delete comment. Please try again.")
     }
 
     revalidatePath(`/debate/${debateId}`)

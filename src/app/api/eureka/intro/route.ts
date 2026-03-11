@@ -17,18 +17,20 @@ export async function POST(req: Request) {
         }
 
         if (!process.env.GEMINI_API_KEY) {
-            return NextResponse.json({ error: "Eureka API Key is missing. Cannot generate introduction." }, { status: 500 });
+            return NextResponse.json({ error: "AI service unavailable" }, { status: 503 });
         }
 
-        console.log(`[EUREKA INTRO] Generating introduction for topic: ${topic}`);
+        // §4 — sanitise inputs
+        const sanitisedTopic = String(topic).slice(0, 300);
+        const sanitisedContext = context ? String(context).slice(0, 1000) : null;
 
         const prompt = `
         You are Eureka, a strictly neutral AI Moderator for a debate platform. 
         A user is creating a new debate. You must write an impartial introductory prompt to set the stage for participants.
         
-        Topic: "${topic}"
+        Topic: "${sanitisedTopic}"
         Context/Sources Provided by User: 
-        ${context ? `"${context}"` : "None provided. Rely purely on the debate topic."}
+        ${sanitisedContext ? `"${sanitisedContext}"` : "None provided. Rely purely on the debate topic."}
         
         Task: Write a strictly neutral debate introduction following "Smart Brevity" rules.
         
@@ -49,7 +51,7 @@ export async function POST(req: Request) {
         `;
 
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-1.5-flash',
             contents: prompt,
         });
 
@@ -62,7 +64,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ intro: generatedIntro });
 
     } catch (e: any) {
-        console.error("[EUREKA INTRO] Fatal Error:", e);
-        return NextResponse.json({ error: e.message || "Internal Server Error" }, { status: 500 });
+        console.error("[EUREKA INTRO] Fatal Error:", e?.message);
+        return NextResponse.json({ error: "An internal error occurred" }, { status: 500 });
     }
 }

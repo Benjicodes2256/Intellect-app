@@ -7,12 +7,15 @@ import { revalidatePath } from "next/cache"
 export async function createPostAction(content: string) {
     const { userId, getToken } = await auth()
 
-    if (!userId) {
-        throw new Error("Must be logged in to post.")
-    }
+    if (!userId) throw new Error("Authentication required.")
+
+    // §4 — Server-side content length validation
+    const trimmed = content?.trim() ?? ''
+    if (!trimmed) throw new Error("Post content cannot be empty.")
+    if (trimmed.length > 5000) throw new Error("Post content is too long (max 5000 characters).")
 
     const token = await getToken({ template: "supabase" })
-    if (!token) throw new Error("Could not fetch auth token")
+    if (!token) throw new Error("Authentication required.")
 
     const supabase = createSupabaseClient(token)
 
@@ -20,13 +23,13 @@ export async function createPostAction(content: string) {
         .from("posts")
         .insert({
             author_id: userId,
-            content,
+            content: trimmed,
             is_eureka_summary: false,
         })
 
     if (error) {
-        console.error("Error creating post:", error)
-        throw new Error(error.message)
+        console.error("Error creating post:", error.message)
+        throw new Error("Failed to create post. Please try again.")
     }
 
     revalidatePath("/feed")
@@ -51,7 +54,8 @@ export async function deletePostAction(postId: string) {
         .eq('author_id', userId) // ensure safety
 
     if (error) {
-        throw new Error(error.message)
+        console.error("Error deleting post:", error.message)
+        throw new Error("Failed to delete post. Please try again.")
     }
 
     revalidatePath("/feed")
@@ -98,19 +102,22 @@ export async function createPostCommentAction(
 ) {
     const { userId, getToken } = await auth()
 
-    if (!userId) {
-        throw new Error("Must be logged in to comment.")
-    }
+    if (!userId) throw new Error("Authentication required.")
+
+    // §4 — Server-side content length validation
+    const trimmed = content?.trim() ?? ''
+    if (!trimmed) throw new Error("Comment cannot be empty.")
+    if (trimmed.length > 2000) throw new Error("Comment is too long (max 2000 characters).")
 
     const token = await getToken({ template: "supabase" })
-    if (!token) throw new Error("Could not fetch auth token")
+    if (!token) throw new Error("Authentication required.")
 
     const supabase = createSupabaseClient(token)
 
     const payload: any = {
         post_id: postId,
         author_id: userId,
-        content,
+        content: trimmed,
     }
 
     if (parentId) {
@@ -122,7 +129,8 @@ export async function createPostCommentAction(
         .insert(payload)
 
     if (insertError) {
-        throw new Error(insertError.message)
+        console.error("Error creating comment:", insertError.message)
+        throw new Error("Failed to post comment. Please try again.")
     }
 
     revalidatePath(`/feed`)
@@ -147,7 +155,8 @@ export async function deletePostCommentAction(commentId: string) {
         .eq('author_id', userId)
 
     if (error) {
-        throw new Error(error.message)
+        console.error("Error deleting comment:", error.message)
+        throw new Error("Failed to delete comment. Please try again.")
     }
 
     revalidatePath(`/feed`)
