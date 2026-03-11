@@ -44,7 +44,7 @@ export default function CreatePostForm() {
                                 value={postContent}
                                 onChange={(e) => setPostContent(e.target.value)}
                                 placeholder="What profound thought is on your mind?"
-                                className="w-full h-32 p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0055ff] resize-none text-sm"
+                                className="w-full h-32 p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0055ff] resize-none text-sm text-gray-900"
                                 disabled={isSubmitting}
                                 required
                                 autoFocus

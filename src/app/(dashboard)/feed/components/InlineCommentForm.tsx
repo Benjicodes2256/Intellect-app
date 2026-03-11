@@ -64,7 +64,7 @@ export default function InlineCommentForm({ postId }: { postId: string }) {
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                         placeholder={replyingTo ? "Write your reply..." : "Add to the discussion..."}
-                        className="w-full min-h-[40px] max-h-[120px] p-3 pr-12 bg-transparent border-transparent focus:ring-0 focus:border-transparent outline-none resize-y text-xs transition-all"
+                        className="w-full min-h-[40px] max-h-[120px] p-3 pr-12 bg-transparent border-transparent focus:ring-0 focus:border-transparent outline-none resize-y text-xs text-gray-900 transition-all"
                         disabled={isSubmitting}
                         required
                     />
