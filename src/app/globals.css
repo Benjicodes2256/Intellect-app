@@ -162,7 +162,11 @@ body {
 }
 
 .landing-auth {
-  padding: 0;
+  padding: 0 0 3rem 0;
+  /* Clear the clerk dev mode banner */
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 .landing-headline {
