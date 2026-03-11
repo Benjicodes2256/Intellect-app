@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { createSupabaseClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import OnboardingTour from '@/components/layout/OnboardingTour'
+import ThemeToggle from '@/components/layout/ThemeToggle'
 
 export default async function DashboardLayout({
     children,
@@ -26,34 +27,85 @@ export default async function DashboardLayout({
         .single()
 
     const isAdmin = userData?.role === 'admin'
-    // Default to true if somehow null to prevent annoying tours on error
     const completedOnboarding = userData?.has_completed_onboarding ?? true
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-24 relative">
-            {/* Top Header Placeholder */}
-            <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 px-4 py-3 shadow-sm">
-                <div className="flex justify-between items-center max-w-2xl mx-auto">
-                    <div className="text-[#0055ff] text-xl font-bold tracking-tight">
-                        iNTEL<span className="text-[#ff5500]">lect</span>
-                    </div>
-                    {/* Reputation / Rank logic goes here eventually */}
-                    <div className="flex items-center gap-3">
+        <div style={{ minHeight: '100vh', background: 'var(--bg)', paddingBottom: '96px', position: 'relative' }}>
+            {/* Top Header */}
+            <header style={{
+                position: 'sticky',
+                top: 0,
+                zIndex: 40,
+                background: 'var(--card)',
+                backdropFilter: 'blur(12px)',
+                borderBottom: '1px solid var(--bdr)',
+                padding: '0 1rem',
+                height: '52px',
+                display: 'flex',
+                alignItems: 'center',
+            }}>
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    maxWidth: '42rem',
+                    margin: '0 auto',
+                    width: '100%',
+                }}>
+                    {/* Logo */}
+                    <span style={{
+                        fontFamily: "'Playfair Display', serif",
+                        fontSize: '1.25rem',
+                        fontWeight: 900,
+                        letterSpacing: '0.04em',
+                        color: 'var(--text)',
+                    }}>
+                        INTEL<em style={{ fontStyle: 'italic', color: 'var(--gold)' }}>lect</em>
+                    </span>
+
+                    {/* Right side */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                         {isAdmin && (
                             <Link
                                 href="/admin"
-                                className="text-[10px] font-bold bg-[#ff5500]/10 text-[#ff5500] px-2 py-1 rounded border border-[#ff5500]/20 hover:bg-[#ff5500]/20 transition-colors uppercase tracking-wider"
+                                style={{
+                                    fontFamily: "'DM Mono', monospace",
+                                    fontSize: '0.5rem',
+                                    fontWeight: 700,
+                                    letterSpacing: '0.12em',
+                                    textTransform: 'uppercase',
+                                    color: 'var(--rust)',
+                                    padding: '0.2rem 0.6rem',
+                                    border: '1px solid rgba(196,88,42,0.3)',
+                                    borderRadius: '2px',
+                                    background: 'rgba(196,88,42,0.08)',
+                                    textDecoration: 'none',
+                                }}
                             >
-                                Admin Dashboard
+                                Admin
                             </Link>
                         )}
-                        <div className="text-xs font-semibold px-2 py-1 rounded bg-gray-100 text-gray-700">Apprentice</div>
+                        <div style={{
+                            fontFamily: "'DM Mono', monospace",
+                            fontSize: '0.5rem',
+                            fontWeight: 500,
+                            letterSpacing: '0.12em',
+                            textTransform: 'uppercase',
+                            color: 'var(--sub)',
+                            padding: '0.2rem 0.6rem',
+                            border: '1px solid var(--bdr)',
+                            borderRadius: '2px',
+                            background: 'var(--surf)',
+                        }}>
+                            Apprentice
+                        </div>
+                        <ThemeToggle />
                     </div>
                 </div>
             </header>
 
             {/* Main Content Area */}
-            <main className="max-w-2xl mx-auto p-4 w-full">
+            <main style={{ maxWidth: '42rem', margin: '0 auto', padding: '1.25rem 1rem', width: '100%' }}>
                 {children}
             </main>
 

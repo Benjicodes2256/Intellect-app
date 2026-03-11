@@ -16,7 +16,21 @@ export function BottomNav() {
     ]
 
     return (
-        <nav className="fixed bottom-0 w-full bg-white border-t border-gray-200 pb-safe pt-2 px-6 flex justify-between items-center z-50">
+        <nav style={{
+            position: 'fixed',
+            bottom: 0,
+            width: '100%',
+            background: 'var(--card)',
+            borderTop: '1px solid var(--bdr)',
+            paddingBottom: 'env(safe-area-inset-bottom)',
+            paddingTop: '0.5rem',
+            paddingLeft: '1.5rem',
+            paddingRight: '1.5rem',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            zIndex: 50,
+        }}>
             {navItems.map((item) => {
                 const isActive = pathname.startsWith(item.path)
                 const Icon = item.icon
@@ -24,16 +38,28 @@ export function BottomNav() {
                     <Link
                         key={item.name}
                         href={item.path}
-                        className={clsx(
-                            item.tourClass,
-                            'flex flex-col items-center gap-1 p-2 rounded-xl transition-all',
-                            isActive
-                                ? 'text-[#ff5500] bg-[rgba(255,85,0,0.1)]'
-                                : 'text-gray-500 hover:text-gray-900'
-                        )}
+                        className={item.tourClass}
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: '0.2rem',
+                            padding: '0.35rem 0.75rem',
+                            borderRadius: '2px',
+                            transition: 'all 0.2s',
+                            color: isActive ? 'var(--gold)' : 'var(--sub)',
+                            background: isActive ? 'rgba(201,151,42,0.08)' : 'transparent',
+                            textDecoration: 'none',
+                        }}
                     >
-                        <Icon size={24} strokeWidth={isActive ? 2.5 : 2} />
-                        <span className="text-xs font-semibold">{item.name}</span>
+                        <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
+                        <span style={{
+                            fontFamily: "'DM Mono', monospace",
+                            fontSize: '0.44rem',
+                            fontWeight: 500,
+                            letterSpacing: '0.1em',
+                            textTransform: 'uppercase',
+                        }}>{item.name}</span>
                     </Link>
                 )
             })}

@@ -1,5 +1,4 @@
-import { Flame, Clock, Users, ArrowLeft, Send } from 'lucide-react'
-import { clsx } from 'clsx'
+import { Flame, Clock, Users, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 import { auth } from "@clerk/nextjs/server"
@@ -8,6 +7,8 @@ import { notFound } from 'next/navigation'
 import CreateCommentForm from './components/CreateCommentForm'
 import DebateCommentActions from './components/DebateCommentActions'
 import CloseDebateButton from './components/CloseDebateButton'
+import InviteButton from '@/components/debate/InviteButton'
+import RichText from '@/components/ui/RichText'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,181 +16,235 @@ export default async function DebateThreadPage({ params }: { params: Promise<{ i
     const { id } = await params
     const { userId, getToken } = await auth()
 
-    if (!userId) {
-        return <div>Please sign in to view this debate.</div>
-    }
+    if (!userId) return <div>Please sign in to view this debate.</div>
 
     const token = await getToken({ template: "supabase" })
     const supabase = createSupabaseClient(token || "")
 
-    // 1. Fetch Debate Topic
     const { data: debate, error: debateError } = await supabase
         .from('debates')
         .select('*')
         .eq('id', id)
         .single()
 
-    if (debateError || !debate) {
-        notFound()
-    }
+    if (debateError || !debate) notFound()
 
-    // 2. Fetch Comments
-    const { data: comments, error: commentsError } = await supabase
+    const { data: comments } = await supabase
         .from('comments')
         .select('*, users(*), likes(user_id)')
         .eq('debate_id', id)
         .order('created_at', { ascending: true })
 
-    // Calculate days left
     const closesAt = new Date(debate.closes_at)
     const now = new Date()
     const diffTime = closesAt.getTime() - now.getTime()
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
     const isClosed = debate.is_closed || diffDays <= 0
 
-    // Calculate dynamic percentages
-    const forComments = comments?.filter(c => c.stance === 'for').length || 0;
-    const againstComments = comments?.filter(c => c.stance === 'against').length || 0;
-    const totalStanceComments = forComments + againstComments;
-    const displayForScore = totalStanceComments > 0 ? Math.round((forComments / totalStanceComments) * 100) : 50;
-    const displayAgainstScore = totalStanceComments > 0 ? Math.round((againstComments / totalStanceComments) * 100) : 50;
+    const forComments = comments?.filter(c => c.stance === 'for').length || 0
+    const againstComments = comments?.filter(c => c.stance === 'against').length || 0
+    const totalStanceComments = forComments + againstComments
+    const displayForScore = totalStanceComments > 0 ? Math.round((forComments / totalStanceComments) * 100) : 50
+    const displayAgainstScore = totalStanceComments > 0 ? Math.round((againstComments / totalStanceComments) * 100) : 50
 
     return (
-        <div className="animate-in fade-in duration-500 min-h-[calc(100vh-80px)] flex flex-col pb-32 pt-2">
+        <div style={{ paddingBottom: '9rem', paddingTop: '0.5rem' }}>
 
-            <div className="shrink-0 mb-4">
-                {/* Header / Thread Nav */}
-                <div className="mb-6 flex space-x-4 items-center px-1">
-                    <Link href="/debate" className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
-                        <ArrowLeft size={20} className="text-gray-700" />
+            <div style={{ marginBottom: '1rem' }}>
+                {/* Back nav */}
+                <div style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <Link
+                        href="/debate"
+                        style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            width: 32, height: 32,
+                            background: 'var(--surf)', border: '1px solid var(--bdr)', borderRadius: '2px',
+                        }}
+                    >
+                        <ArrowLeft size={16} style={{ color: 'var(--sub)' }} />
                     </Link>
-                    <div>
-                        <h1 className="text-xl font-bold text-[#0055ff]">Debate Arena</h1>
+                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.48rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--gold)' }}>
+                        Debate Arena
+                    </div>
+                    <div style={{ marginLeft: 'auto' }}>
+                        <InviteButton debateId={debate.id} debateTopic={debate.topic} />
                     </div>
                 </div>
 
-                {/* Main Topic Banner */}
-                <div className="bg-white rounded-2xl shadow-sm border border-orange-100 p-6">
-                    <div className="flex justify-between items-start mb-3">
-                        <div className="flex items-center gap-2">
-                            <div className="bg-orange-50 text-[#ff5500] px-2 py-1 rounded font-bold text-xs flex items-center gap-1 border border-orange-100">
-                                <Flame size={14} />
-                                {debate.rating || 0} Rating
-                            </div>
-                            <div className={clsx(
-                                "px-2 py-1 rounded font-bold text-xs flex items-center gap-1 border",
-                                isClosed ? "bg-gray-50 text-gray-500 border-gray-200" : "bg-blue-50 text-[#0055ff] border-blue-100"
-                            )}>
-                                <Clock size={14} />
-                                {isClosed ? 'Closed' : `${diffDays}d Left`}
-                            </div>
-                            {/* Render Close Button only for the Debate Creator if it's still open */}
-                            {!isClosed && userId === debate.creator_id && (
-                                <CloseDebateButton debateId={debate.id} userId={userId} />
-                            )}
+                {/* Topic Banner */}
+                <div style={{ background: 'var(--card)', borderRadius: '2px', border: '1px solid var(--bdr)', padding: '1.25rem' }}>
+                    {/* Badges */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                        <div style={{
+                            display: 'flex', alignItems: 'center', gap: '0.3rem',
+                            background: 'rgba(196,88,42,0.1)', color: 'var(--rust)',
+                            padding: '0.2rem 0.5rem', borderRadius: '2px',
+                            border: '1px solid rgba(196,88,42,0.2)',
+                            fontFamily: "'DM Mono', monospace", fontSize: '0.48rem', fontWeight: 700,
+                        }}>
+                            <Flame size={11} />
+                            {debate.rating || 0} Rating
                         </div>
+                        <div style={{
+                            display: 'flex', alignItems: 'center', gap: '0.3rem',
+                            padding: '0.2rem 0.5rem', borderRadius: '2px',
+                            fontFamily: "'DM Mono', monospace", fontSize: '0.48rem', fontWeight: 700,
+                            ...(isClosed
+                                ? { background: 'var(--surf)', color: 'var(--sub)', border: '1px solid var(--bdr)' }
+                                : { background: 'rgba(106,76,147,0.12)', color: 'var(--violet-lt)', border: '1px solid rgba(106,76,147,0.25)' }
+                            )
+                        }}>
+                            <Clock size={11} />
+                            {isClosed ? 'Closed' : `${diffDays}d Left`}
+                        </div>
+                        {!isClosed && userId === debate.creator_id && (
+                            <CloseDebateButton debateId={debate.id} userId={userId} />
+                        )}
                     </div>
 
-                    <h2 className="text-2xl font-black text-gray-900 leading-snug mb-3">
+                    {/* Topic */}
+                    <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.35rem', fontWeight: 900, color: 'var(--text)', lineHeight: 1.2, marginBottom: '0.6rem' }}>
                         {debate.topic}
                     </h2>
 
-                    <div className="flex items-center gap-1 text-xs text-gray-500 font-medium pb-4 border-b border-gray-100">
-                        <Users size={14} /> {comments?.length || 0} Participants
+                    {/* Participants */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.65rem', color: 'var(--sub)', fontFamily: "'DM Mono', monospace", paddingBottom: '0.75rem', borderBottom: '1px solid var(--bdr)', marginBottom: '0.75rem' }}>
+                        <Users size={12} /> {comments?.length || 0} Participants
                     </div>
 
-                    <div className="mt-4 flex gap-4">
-                        <div className="flex-1 bg-blue-50/50 p-4 rounded-xl border border-blue-100 text-center transition-all">
-                            <div className="text-sm font-bold text-[#0055ff] uppercase">FOR ({displayForScore}%)</div>
+                    {/* FOR vs AGAINST */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                        <div style={{ background: 'rgba(106,76,147,0.08)', padding: '0.75rem', borderRadius: '2px', border: '1px solid rgba(106,76,147,0.2)', textAlign: 'center' }}>
+                            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.55rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--violet-lt)' }}>
+                                FOR ({displayForScore}%)
+                            </div>
                         </div>
-                        <div className="flex-1 bg-orange-50/50 p-4 rounded-xl border border-orange-100 text-center transition-all">
-                            <div className="text-sm font-bold text-[#ff5500] uppercase">AGAINST ({displayAgainstScore}%)</div>
+                        <div style={{ background: 'rgba(196,88,42,0.08)', padding: '0.75rem', borderRadius: '2px', border: '1px solid rgba(196,88,42,0.2)', textAlign: 'center' }}>
+                            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.55rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--rust)' }}>
+                                AGAINST ({displayAgainstScore}%)
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Thread (Scrollable Chat Feed) */}
-            <div className="flex-1 space-y-3 mb-2 px-2 flex flex-col">
-                <h3 className="font-bold text-gray-900 px-2 tracking-wide uppercase text-sm mb-2 text-center opacity-50">Live Arguments</h3>
+            {/* Thread */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '0.5rem', padding: '0 2px' }}>
+                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.46rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--sub)', textAlign: 'center', paddingBottom: '0.5rem', opacity: 0.6 }}>
+                    Live Arguments
+                </div>
 
-                {/* Eureka System Welcome Message */}
-                <div className="flex flex-col w-full mb-3 items-center">
-                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50/50 border border-blue-100/50 rounded-2xl p-4 shadow-sm max-w-[95%] md:max-w-[85%] text-center relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#0055ff] to-purple-500 opacity-50"></div>
-                        <div className="font-black text-transparent bg-clip-text bg-gradient-to-r from-[#0055ff] to-purple-600 mb-2 flex items-center justify-center gap-1.5 text-[10px] tracking-widest uppercase">
+                {/* Eureka welcome */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '0.5rem' }}>
+                    <div style={{
+                        background: 'var(--card)',
+                        border: '1px solid var(--bdr)',
+                        borderRadius: '2px',
+                        padding: '1rem',
+                        maxWidth: '95%',
+                        textAlign: 'center',
+                        position: 'relative',
+                        overflow: 'hidden',
+                    }}>
+                        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: 'linear-gradient(90deg, var(--violet), var(--violet-lt))', opacity: 0.7 }} />
+                        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.46rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--violet-lt)', marginBottom: '0.5rem', fontWeight: 700 }}>
                             Eureka System
                         </div>
-                        <div className="text-[13px] text-gray-700 leading-relaxed font-medium">
-                            Welcome to the Arena. The topic is <span className="font-bold text-gray-900 leading-relaxed px-1">"{debate.topic}"</span>.
+                        <div style={{ fontSize: '0.78rem', color: 'var(--sub)', lineHeight: 1.65 }}>
+                            Welcome to the Arena. The topic is{' '}
+                            <span style={{ fontWeight: 700, color: 'var(--text)' }}>"{debate.topic}"</span>.
                             <br /><br />
                             {debate.introduction && (
-                                <div className="text-left bg-white/50 rounded-xl p-3 my-3 text-xs shadow-inner">
-                                    <h4 className="font-bold text-[#0055ff] mb-1">Debate Context:</h4>
-                                    <div className="prose prose-sm max-w-none text-gray-800 prose-p:leading-relaxed prose-li:my-0">
-                                        <ReactMarkdown>
-                                            {debate.introduction}
-                                        </ReactMarkdown>
+                                <div style={{
+                                    textAlign: 'left',
+                                    background: 'var(--surf)',
+                                    borderRadius: '2px',
+                                    padding: '0.65rem',
+                                    margin: '0 0 0.65rem',
+                                    border: '1px solid var(--bdr)',
+                                    fontSize: '0.72rem',
+                                }}>
+                                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.46rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '0.4rem' }}>
+                                        Debate Context
+                                    </div>
+                                    <div style={{ fontSize: '0.72rem', color: 'var(--sub)', lineHeight: 1.6 }}>
+                                        <RichText content={debate.introduction} small />
                                     </div>
                                 </div>
                             )}
-                            Remember the Charter: logical integrity is required. Unsubstantiated claims will be penalized, and factual logic will be rewarded. Make the first move to earn Reputation Points!
+                            Logical integrity is required. Unsubstantiated claims will be penalized, and factual logic will be rewarded. Make the first move to earn Reputation Points!
                         </div>
                     </div>
                 </div>
 
+                {/* Comment Bubbles */}
                 {comments?.map((comment: any) => {
-                    const isMe = userId === comment.author_id;
+                    const isMe = userId === comment.author_id
                     return (
-                        <div key={comment.id} className={clsx(
-                            "flex flex-col w-full mb-1",
-                            isMe ? "items-start" : "items-end"
-                        )}>
-
-                            {/* Parent Reply Context if exists */}
+                        <div key={comment.id} style={{ display: 'flex', flexDirection: 'column', width: '100%', marginBottom: '0.25rem', alignItems: isMe ? 'flex-start' : 'flex-end' }}>
+                            {/* Parent reply context */}
                             {comment.parent_id && (
-                                <div className={clsx(
-                                    "flex flex-col mx-2 mb-1 px-3 py-1.5 rounded-xl border-l-4 text-xs opacity-80 max-w-[75%]",
-                                    isMe ? "bg-[#ff5500]/10 border-[#ff5500]" : "bg-black/5 border-gray-400"
-                                )}>
-                                    <div className={clsx("font-bold mb-0.5", isMe ? "text-[#ff5500]" : "text-gray-700")}>
+                                <div style={{
+                                    display: 'flex', flexDirection: 'column',
+                                    margin: '0 0.5rem 0.25rem',
+                                    padding: '0.3rem 0.65rem',
+                                    borderRadius: '2px',
+                                    borderLeft: `3px solid ${isMe ? 'var(--rust)' : 'var(--sub)'}`,
+                                    background: isMe ? 'rgba(196,88,42,0.06)' : 'rgba(255,255,255,0.03)',
+                                    maxWidth: '75%',
+                                    fontSize: '0.65rem',
+                                    opacity: 0.85,
+                                }}>
+                                    <div style={{ fontWeight: 700, color: isMe ? 'var(--rust)' : 'var(--sub)', fontFamily: "'DM Mono', monospace", fontSize: '0.5rem', marginBottom: '0.1rem' }}>
                                         {comments.find((c: any) => c.id === comment.parent_id)?.users?.clerk_username || 'Participant'}
                                     </div>
-                                    <div className="text-gray-600 truncate">
+                                    <div style={{ color: 'var(--sub)', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
                                         {comments.find((c: any) => c.id === comment.parent_id)?.content || 'Original message removed'}
                                     </div>
                                 </div>
                             )}
 
-                            {/* Chat Bubble Container */}
-                            <div className={clsx(
-                                "relative transition-all max-w-[95%] md:max-w-[85%] rounded-2xl p-3 shadow-sm",
-                                isMe
-                                    ? "bg-[#ff5500]/10 border border-[#ff5500]/20 text-gray-900 rounded-tr-sm"
-                                    : "bg-[#0055ff]/10 border border-[#0055ff]/20 text-gray-900 rounded-tl-sm"
-                            )}>
-                                {/* Info Row */}
-                                <div className="flex justify-between items-start mb-1.5 gap-4">
-                                    <div className="font-bold text-[11px] flex items-center gap-1.5">
+                            {/* Bubble */}
+                            <div style={{
+                                position: 'relative',
+                                maxWidth: '92%',
+                                borderRadius: '2px',
+                                padding: '0.65rem',
+                                ...(isMe
+                                    ? {
+                                        background: 'rgba(196,88,42,0.07)',
+                                        border: '1px solid rgba(196,88,42,0.2)',
+                                        borderTopLeftRadius: 0,
+                                    }
+                                    : {
+                                        background: 'rgba(106,76,147,0.07)',
+                                        border: '1px solid rgba(106,76,147,0.18)',
+                                        borderTopRightRadius: 0,
+                                    }
+                                )
+                            }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.3rem', gap: '0.75rem' }}>
+                                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.52rem', fontWeight: 700, color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                                         {comment.users?.clerk_username || 'Unknown User'}
-                                        <span className={clsx(
-                                            "text-[9px] px-1 py-0.5 rounded-sm font-bold uppercase",
-                                            comment.stance === 'for' ? "bg-blue-100 text-[#0055ff]" : "bg-orange-100 text-[#ff5500]"
-                                        )}>
+                                        <span style={{
+                                            fontSize: '0.44rem', padding: '0.1rem 0.35rem', borderRadius: '2px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em',
+                                            ...(comment.stance === 'for'
+                                                ? { background: 'rgba(106,76,147,0.15)', color: 'var(--violet-lt)' }
+                                                : { background: 'rgba(196,88,42,0.15)', color: 'var(--rust)' }
+                                            )
+                                        }}>
                                             {comment.stance}
                                         </span>
                                     </div>
-                                    <div className="text-[9px] text-gray-500 font-medium whitespace-nowrap mt-0.5 opacity-70">
+                                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.44rem', color: 'var(--sub)', whiteSpace: 'nowrap', marginTop: '0.1rem', opacity: 0.7 }}>
                                         {new Date(comment.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     </div>
                                 </div>
 
-                                {/* Body */}
-                                <div className="text-[13px] leading-snug mb-2 whitespace-pre-wrap break-words">
-                                    {comment.content}
+                                <div style={{ marginBottom: '0.5rem' }}>
+                                    <RichText content={comment.content} small />
                                 </div>
 
-                                {/* Actions & Interactions */}
                                 <DebateCommentActions
                                     comment={comment}
                                     debateId={debate.id}
@@ -198,7 +253,12 @@ export default async function DebateThreadPage({ params }: { params: Promise<{ i
                                 />
 
                                 {comment.eureka_points_awarded > 0 && (
-                                    <div className="mt-2 inline-flex items-center gap-1 bg-green-50 text-green-700 text-[10px] font-bold px-2 py-1 rounded w-full">
+                                    <div style={{
+                                        marginTop: '0.4rem', display: 'inline-flex', alignItems: 'center', gap: '0.25rem',
+                                        background: 'rgba(106,76,147,0.1)', color: 'var(--violet-lt)',
+                                        fontSize: '0.5rem', fontFamily: "'DM Mono', monospace", fontWeight: 700,
+                                        padding: '0.2rem 0.5rem', borderRadius: '2px', width: '100%',
+                                    }}>
                                         +{comment.eureka_points_awarded} Rep Points (Verified)
                                     </div>
                                 )}
@@ -208,14 +268,18 @@ export default async function DebateThreadPage({ params }: { params: Promise<{ i
                 })}
             </div>
 
-            {/* Anchored Input Form */}
-            <div className="fixed bottom-[65px] left-0 right-0 z-40 px-2 pb-2 pointer-events-none transition-transform pointer-events-none">
-                <div className="max-w-2xl mx-auto w-full pointer-events-auto">
+            {/* Anchored Input */}
+            <div style={{ position: 'fixed', bottom: '65px', left: 0, right: 0, zIndex: 40, padding: '0 0.5rem 0.5rem' }}>
+                <div style={{ maxWidth: '42rem', margin: '0 auto', width: '100%' }}>
                     {!isClosed ? (
                         <CreateCommentForm debateId={debate.id} />
                     ) : (
-                        <div className="bg-gray-50 rounded-xl p-4 text-center">
-                            <p className="font-bold text-gray-600">This debate is sealed.</p>
+                        <div style={{
+                            background: 'var(--surf)', borderRadius: '2px', padding: '1rem', textAlign: 'center',
+                            border: '1px solid var(--bdr)',
+                            fontFamily: "'DM Mono', monospace", fontSize: '0.62rem', color: 'var(--sub)', letterSpacing: '0.08em',
+                        }}>
+                            This debate is sealed.
                         </div>
                     )}
                 </div>
