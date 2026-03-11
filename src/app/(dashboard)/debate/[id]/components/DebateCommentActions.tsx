@@ -11,9 +11,10 @@ interface Props {
     debateId: string;
     userId: string;
     isClosed: boolean;
+    isAdmin?: boolean;
 }
 
-export default function DebateCommentActions({ comment, debateId, userId, isClosed }: Props) {
+export default function DebateCommentActions({ comment, debateId, userId, isClosed, isAdmin = false }: Props) {
     const [isReplying, setIsReplying] = useState(false)
 
     const initialLikes = comment.likes?.length || 0;
@@ -40,7 +41,7 @@ export default function DebateCommentActions({ comment, debateId, userId, isClos
                     )}
                 </div>
 
-                {userId === comment.author_id && !isClosed && (
+                {(userId === comment.author_id || isAdmin) && !isClosed && (
                     <DeleteCommentButton
                         commentId={comment.id}
                         debateId={debateId}

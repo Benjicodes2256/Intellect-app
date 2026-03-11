@@ -60,11 +60,16 @@ export async function deleteDebateAction(debateId: string) {
 
     const supabase = createSupabaseClient(token)
 
-    const { error } = await supabase
-        .from("debates")
-        .delete()
-        .eq("id", debateId)
-        .eq("creator_id", userId) // Enforce ownership check
+    // Check if user is admin
+    const { data: userData } = await supabase.from('users').select('role').eq('clerk_id', userId).single()
+    const isAdmin = userData?.role === 'admin'
+
+    let query = supabase.from("debates").delete().eq("id", debateId)
+    if (!isAdmin) {
+        query = query.eq("creator_id", userId) // Enforce ownership check for regular users
+    }
+
+    const { error } = await query
 
     if (error) {
         console.error("Error deleting debate:", error.message)

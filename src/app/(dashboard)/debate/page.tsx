@@ -40,7 +40,7 @@ function DebateBar({ scoreFor, scoreAgainst }: { scoreFor: number, scoreAgainst:
     )
 }
 
-function DebateTile({ debate, isOwner }: { debate: any, isOwner: boolean }) {
+function DebateTile({ debate, isOwner, isAdmin }: { debate: any, isOwner: boolean, isAdmin: boolean }) {
     const closesAt = new Date(debate.closes_at)
     const now = new Date()
     const diffTime = closesAt.getTime() - now.getTime()
@@ -83,7 +83,7 @@ function DebateTile({ debate, isOwner }: { debate: any, isOwner: boolean }) {
                         {isClosed ? 'Closed' : `${diffDays}d Left`}
                     </div>
                 </div>
-                {isOwner && <DeleteDebateButton debateId={debate.id} />}
+                {(isOwner || isAdmin) && <DeleteDebateButton debateId={debate.id} />}
             </div>
 
             <h2 style={{
@@ -182,13 +182,17 @@ export default async function DebatePage() {
                     </div>
                 )}
 
-                {debates?.map(debate => (
-                    <DebateTile
-                        key={debate.id}
-                        debate={debate}
-                        isOwner={debate.creator_id === userId}
-                    />
-                ))}
+                {debates?.map(debate => {
+                    const isOwner = debate.creator_id === userId;
+                    return (
+                        <DebateTile
+                            key={debate.id}
+                            debate={debate}
+                            isOwner={isOwner}
+                            isAdmin={isAdmin}
+                        />
+                    );
+                })}
 
                 <div style={{ textAlign: 'center', fontSize: '0.58rem', color: 'var(--sub)', padding: '1.5rem 0', borderTop: '1px solid var(--bdr)', marginTop: '1.5rem', fontFamily: "'DM Mono', monospace", letterSpacing: '0.08em' }}>
                     Make sure you have the facts straight.

@@ -47,11 +47,16 @@ export async function deletePostAction(postId: string) {
 
     const supabase = createSupabaseClient(token)
 
-    const { error } = await supabase
-        .from('posts')
-        .delete()
-        .eq('id', postId)
-        .eq('author_id', userId) // ensure safety
+    // Check if user is admin
+    const { data: userData } = await supabase.from('users').select('role').eq('clerk_id', userId).single()
+    const isAdmin = userData?.role === 'admin'
+
+    let query = supabase.from('posts').delete().eq('id', postId)
+    if (!isAdmin) {
+        query = query.eq('author_id', userId) // ensure safety for regular users
+    }
+
+    const { error } = await query
 
     if (error) {
         console.error("Error deleting post:", error.message)
@@ -148,11 +153,16 @@ export async function deletePostCommentAction(commentId: string) {
 
     const supabase = createSupabaseClient(token)
 
-    const { error } = await supabase
-        .from('comments')
-        .delete()
-        .eq('id', commentId)
-        .eq('author_id', userId)
+    // Check if user is admin
+    const { data: userData } = await supabase.from('users').select('role').eq('clerk_id', userId).single()
+    const isAdmin = userData?.role === 'admin'
+
+    let query = supabase.from('comments').delete().eq('id', commentId)
+    if (!isAdmin) {
+        query = query.eq('author_id', userId)
+    }
+
+    const { error } = await query
 
     if (error) {
         console.error("Error deleting comment:", error.message)

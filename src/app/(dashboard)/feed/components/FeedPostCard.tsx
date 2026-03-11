@@ -9,7 +9,7 @@ import LikeButton from '../../debate/[id]/components/LikeButton'
 import DeletePostCommentButton from './DeletePostCommentButton'
 import RichText from '@/components/ui/RichText'
 
-export default function FeedPostCard({ post, currentUserId }: { post: any, currentUserId: string }) {
+export default function FeedPostCard({ post, currentUserId, isAdmin }: { post: any, currentUserId: string, isAdmin: boolean }) {
     const [showComments, setShowComments] = useState(false)
     const [expanded, setExpanded] = useState(false)
 
@@ -65,7 +65,7 @@ export default function FeedPostCard({ post, currentUserId }: { post: any, curre
                         </div>
                     </div>
                 </div>
-                {currentUserId === post.author_id && <DeletePostButton postId={post.id} />}
+                {(currentUserId === post.author_id || isAdmin) && <DeletePostButton postId={post.id} />}
             </div>
 
             {/* Content */}
@@ -186,7 +186,7 @@ export default function FeedPostCard({ post, currentUserId }: { post: any, curre
                                         Reply
                                     </button>
 
-                                    {currentUserId === comment.author_id && (
+                                    {(currentUserId === comment.author_id || isAdmin) && (
                                         <div style={{ marginLeft: 'auto' }}>
                                             <DeletePostCommentButton commentId={comment.id} />
                                         </div>

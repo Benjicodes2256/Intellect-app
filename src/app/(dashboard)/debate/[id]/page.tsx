@@ -277,6 +277,7 @@ export default async function DebateThreadPage({ params }: { params: Promise<{ i
                                     debateId={debate.id}
                                     userId={userId}
                                     isClosed={isClosed}
+                                    isAdmin={userData?.role === 'admin'}
                                 />
 
                                 {comment.eureka_points_awarded > 0 && (

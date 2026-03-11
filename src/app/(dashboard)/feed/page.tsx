@@ -21,6 +21,9 @@ export default async function FeedPage() {
         .select('*, users(*), likes(user_id), comments(*, users(*), likes(user_id))')
         .order('created_at', { ascending: false })
 
+    const { data: userData } = await supabase.from('users').select('role').eq('clerk_id', userId).single()
+    const isAdmin = userData?.role === 'admin'
+
     if (error) {
         console.error(error)
     }
@@ -52,7 +55,7 @@ export default async function FeedPage() {
                 )}
 
                 {posts?.map((post: any) => (
-                    <FeedPostCard key={post.id} post={post} currentUserId={userId} />
+                    <FeedPostCard key={post.id} post={post} currentUserId={userId} isAdmin={isAdmin} />
                 ))}
 
                 <div style={{ textAlign: 'center', fontSize: '0.58rem', color: 'var(--sub)', padding: '1.5rem 0', borderTop: '1px solid var(--bdr)', marginTop: '0.5rem', fontFamily: "'DM Mono', monospace", letterSpacing: '0.08em' }}>

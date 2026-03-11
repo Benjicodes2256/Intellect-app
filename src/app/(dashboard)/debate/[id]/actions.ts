@@ -150,12 +150,17 @@ export async function deleteCommentAction(commentId: string, debateId: string) {
         throw new Error("Cannot delete comments from a closed debate.")
     }
 
-    const { error } = await supabase
-        .from('comments')
-        .delete()
-        .eq('id', commentId)
+    // Check if user is admin
+    const { data: userData } = await supabase.from('users').select('role').eq('clerk_id', userId).single()
+    const isAdmin = userData?.role === 'admin'
+
+    let query = supabase.from('comments').delete().eq('id', commentId)
+    if (!isAdmin) {
         // Ensure the user trying to delete is the original author
-        .eq('author_id', userId)
+        query = query.eq('author_id', userId)
+    }
+
+    const { error } = await query
 
     if (error) {
         console.error("Error deleting comment:", error.message)
