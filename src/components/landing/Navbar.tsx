@@ -14,20 +14,7 @@ export default function Navbar() {
         borderBottom: '1px solid var(--bdr)',
       }}
     >
-      {/* Brand */}
-      <a
-        href="#"
-        style={{
-          fontFamily: "'Playfair Display', serif",
-          fontSize: '1.35rem',
-          fontWeight: 900,
-          letterSpacing: '0.04em',
-          color: 'var(--text)',
-          textDecoration: 'none',
-        }}
-      >
-        INTEL<em style={{ fontStyle: 'italic', color: 'var(--gold)' }}>lect</em>
-      </a>
+      <div></div>
 
       {/* Theme toggle */}
       <button
