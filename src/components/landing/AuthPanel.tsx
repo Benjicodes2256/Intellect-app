@@ -91,7 +91,7 @@ export default function AuthPanel({ redirectUrl }: AuthPanelProps) {
       {mode === 'signin' ? (
         <>
           <SignIn routing="hash" forceRedirectUrl={redirectUrl} appearance={appearanceProps} />
-          <div style={{ textAlign: 'center', marginTop: '-0.5rem', fontSize: '0.75rem', color: 'var(--sub)' }}>
+          <div style={{ textAlign: 'center', marginTop: '1rem', position: 'relative', zIndex: 10, fontSize: '0.75rem', color: 'var(--sub)' }}>
             Don't have an account?{' '}
             <button onClick={() => setMode('signup')} style={{ color: 'var(--violet-lt)', background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, fontSize: 'inherit', fontWeight: 600 }}>
               Sign up
@@ -101,7 +101,7 @@ export default function AuthPanel({ redirectUrl }: AuthPanelProps) {
       ) : (
         <>
           <SignUp routing="hash" forceRedirectUrl={redirectUrl} appearance={appearanceProps} />
-          <div style={{ textAlign: 'center', marginTop: '-0.5rem', fontSize: '0.75rem', color: 'var(--sub)' }}>
+          <div style={{ textAlign: 'center', marginTop: '1rem', position: 'relative', zIndex: 10, fontSize: '0.75rem', color: 'var(--sub)' }}>
             Already have an account?{' '}
             <button onClick={() => setMode('signin')} style={{ color: 'var(--violet-lt)', background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, fontSize: 'inherit', fontWeight: 600 }}>
               Sign in
