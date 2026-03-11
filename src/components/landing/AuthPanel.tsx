@@ -30,6 +30,7 @@ export default function AuthPanel({ redirectUrl }: AuthPanelProps) {
       },
       headerTitle: { display: 'none' },
       headerSubtitle: { display: 'none' },
+      logoBox: { display: 'none' },
       socialButtonsBlockButton: {
         border: '1px solid rgba(255,255,255,0.06)',
         background: 'transparent',
