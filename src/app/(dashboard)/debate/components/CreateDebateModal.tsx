@@ -86,7 +86,7 @@ export default function CreateDebateButton() {
                                     value={topic}
                                     onChange={(e) => setTopic(e.target.value)}
                                     placeholder="State the core argument clearly..."
-                                    className="w-full h-20 p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#ff5500] resize-none text-sm"
+                                    className="w-full h-20 p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#ff5500] resize-none text-sm text-gray-900"
                                     disabled={isSubmitting}
                                     required
                                 />
@@ -98,7 +98,7 @@ export default function CreateDebateButton() {
                                     value={context}
                                     onChange={(e) => setContext(e.target.value)}
                                     placeholder="Paste news links or write messy context here. Eureka will summarize it neutrally."
-                                    className="w-full h-16 p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0055ff] resize-none text-sm"
+                                    className="w-full h-16 p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0055ff] resize-none text-sm text-gray-900"
                                     disabled={isSubmitting || isGenerating}
                                 />
                                 <div className="flex justify-end mt-2">
@@ -131,7 +131,7 @@ export default function CreateDebateButton() {
                                 <select
                                     value={timeframe}
                                     onChange={(e) => setTimeframe(Number(e.target.value))}
-                                    className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#ff5500] text-sm bg-white"
+                                    className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#ff5500] text-sm bg-white text-gray-900"
                                     disabled={isSubmitting}
                                 >
                                     <option value={1}>1 Day (Blitz)</option>

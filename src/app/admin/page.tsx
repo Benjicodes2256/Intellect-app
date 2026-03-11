@@ -1,7 +1,8 @@
 import { auth } from '@clerk/nextjs/server'
 import { createClient } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
-import { BarChart3, Users, MessageSquare, Activity, Flame, ChevronLeft } from 'lucide-react'
+import { Trash2, AlertTriangle, CheckCircle, Search, UserMinus, ShieldAlert, BarChart3, Users, Activity, MessageSquare, Flame, FileText, ChevronLeft, ArrowRight } from 'lucide-react'
+import ReopenDebateButton from '../(dashboard)/debate/[id]/components/ReopenDebateButton'
 import Link from 'next/link'
 import UserManagementPanel from './components/UserManagementPanel'
 import FlaggedContentPanel from './components/FlaggedContentPanel'
@@ -28,7 +29,7 @@ export default async function AdminDashboardPage() {
     if (userData?.role !== 'admin') redirect('/feed')
 
     // Fetch all data in parallel
-    const [usersRes, postsRes, commentsRes, debatesRes, allUsersRes, flaggedRes, recentPostsRes] = await Promise.all([
+    const [usersRes, postsRes, commentsRes, debatesRes, allUsersRes, flaggedRes, recentPostsRes, closedDebatesRes] = await Promise.all([
         supabase.from('users').select('*', { count: 'exact', head: true }),
         supabase.from('posts').select('*', { count: 'exact', head: true }),
         supabase.from('comments').select('*', { count: 'exact', head: true }),
@@ -36,11 +37,13 @@ export default async function AdminDashboardPage() {
         supabase.from('users').select('*').order('created_at', { ascending: false }),
         supabase.from('comments').select('*, users(clerk_username)').or('is_fluff.eq.true,is_vulgar.eq.true').order('created_at', { ascending: false }),
         supabase.from('posts').select('*, users(clerk_username)').eq('is_eureka_summary', false).order('created_at', { ascending: false }).limit(30),
+        supabase.from('debates').select('*').eq('is_closed', true).order('closes_at', { ascending: false }).limit(20)
     ])
 
     const allUsers = allUsersRes.data || []
     const flaggedComments = flaggedRes.data || []
     const recentPosts = recentPostsRes.data || []
+    const closedDebates = closedDebatesRes.data || []
 
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg)', paddingBottom: '6rem' }}>
@@ -92,6 +95,45 @@ export default async function AdminDashboardPage() {
                     </div>
                     <p style={{ fontSize: '0.65rem', color: 'var(--sub)' }}>Review flagged comments and delete posts. Actions are irreversible.</p>
                     <FlaggedContentPanel flaggedComments={flaggedComments} recentPosts={recentPosts} />
+                </div>
+
+                {/* Closed Debates Management */}
+                <div style={{ background: 'var(--card)', border: '1px solid var(--gold)', borderRadius: '4px', padding: '1.25rem', marginTop: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                        <Flame size={16} style={{ color: 'var(--gold)' }} />
+                        <h2 style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: '1rem', color: 'var(--text)' }}>Closed Debates</h2>
+                    </div>
+                    <p style={{ fontSize: '0.65rem', color: 'var(--sub)', marginBottom: '1rem' }}>Reopen closed debates to allow participants to continue arguing.</p>
+
+                    {closedDebates.length === 0 ? (
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100px', border: '1px dashed var(--bdr)', borderRadius: '2px', color: 'var(--sub)', fontSize: '0.72rem' }}>
+                            No closed debates currently.
+                        </div>
+                    ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            {closedDebates.map((debate: any) => (
+                                <div key={debate.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem', background: 'var(--bg)', border: '1px solid var(--bdr)', borderRadius: '2px' }}>
+                                    <div style={{ flex: 1, paddingRight: '1rem' }}>
+                                        <h3 style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text)', marginBottom: '0.2rem' }}>{debate.topic}</h3>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontFamily: "'DM Mono', monospace", fontSize: '0.5rem', color: 'var(--sub)' }}>
+                                            {debate.is_private ? (
+                                                <span style={{ color: 'var(--rust)', background: 'rgba(196,88,42,0.1)', padding: '0.1rem 0.3rem', borderRadius: '1px' }}>PRIVATE</span>
+                                            ) : (
+                                                <span style={{ color: 'var(--violet-lt)', background: 'rgba(107,79,216,0.1)', padding: '0.1rem 0.3rem', borderRadius: '1px' }}>PUBLIC</span>
+                                            )}
+                                            <span>· Closed: {new Date(debate.closes_at).toLocaleDateString()}</span>
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                        <ReopenDebateButton debateId={debate.id} />
+                                        <Link href={`/debate/${debate.id}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '28px', height: '28px', background: 'var(--surf)', border: '1px solid var(--bdr)', borderRadius: '2px', color: 'var(--sub)' }}>
+                                            <ArrowRight size={14} />
+                                        </Link>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
             </div>
