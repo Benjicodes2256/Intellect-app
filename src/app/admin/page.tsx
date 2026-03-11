@@ -1,118 +1,97 @@
 import { auth } from '@clerk/nextjs/server'
-import { createSupabaseClient } from '@/lib/supabase/client'
+import { createClient } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
-import { BarChart3, Users, MessageSquare, Activity, Flame, Navigation, Link as LinkIcon, ChevronLeft } from 'lucide-react'
+import { BarChart3, Users, MessageSquare, Activity, Flame, ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
+import UserManagementPanel from './components/UserManagementPanel'
+import FlaggedContentPanel from './components/FlaggedContentPanel'
+
+export const dynamic = 'force-dynamic'
+
+// Admin page uses service role to bypass RLS for full visibility
+function getAdminSupabase() {
+    return createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        { auth: { persistSession: false } }
+    )
+}
 
 export default async function AdminDashboardPage() {
-    const { userId, getToken } = await auth()
+    const { userId } = await auth()
+    if (!userId) redirect('/sign-in')
 
-    if (!userId) {
-        redirect('/sign-in')
-    }
+    const supabase = getAdminSupabase()
 
-    const token = await getToken({ template: "supabase" })
-    const supabase = createSupabaseClient(token || "")
+    // Verify admin
+    const { data: userData } = await supabase.from('users').select('role').eq('clerk_id', userId).single()
+    if (userData?.role !== 'admin') redirect('/feed')
 
-    // 1. Verify user is admin
-    const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('role')
-        .eq('clerk_id', userId)
-        .single()
-
-    if (userError || userData?.role !== 'admin') {
-        redirect('/feed')
-    }
-
-    // 2. Fetch parallel counts
-    const [usersCount, postsCount, commentsCount, debatesCount] = await Promise.all([
+    // Fetch all data in parallel
+    const [usersRes, postsRes, commentsRes, debatesRes, allUsersRes, flaggedRes, recentPostsRes] = await Promise.all([
         supabase.from('users').select('*', { count: 'exact', head: true }),
         supabase.from('posts').select('*', { count: 'exact', head: true }),
         supabase.from('comments').select('*', { count: 'exact', head: true }),
         supabase.from('debates').select('*', { count: 'exact', head: true }).eq('is_closed', false),
+        supabase.from('users').select('*').order('created_at', { ascending: false }),
+        supabase.from('comments').select('*, users(clerk_username)').or('is_fluff.eq.true,is_vulgar.eq.true').order('created_at', { ascending: false }),
+        supabase.from('posts').select('*, users(clerk_username)').eq('is_eureka_summary', false).order('created_at', { ascending: false }).limit(30),
     ])
 
+    const allUsers = allUsersRes.data || []
+    const flaggedComments = flaggedRes.data || []
+    const recentPosts = recentPostsRes.data || []
+
     return (
-        <div className="min-h-screen bg-gray-50 p-6">
-            <div className="max-w-5xl mx-auto">
+        <div style={{ minHeight: '100vh', background: 'var(--bg)', paddingBottom: '6rem' }}>
+            <div style={{ maxWidth: '48rem', margin: '0 auto', padding: '1.5rem 1rem' }}>
 
                 {/* Header */}
-                <div className="flex flex-col mb-8 relative">
-                    <Link href="/feed" className="flex items-center gap-1 text-sm font-semibold text-gray-400 hover:text-[#0055ff] transition-colors mb-4 w-fit">
-                        <ChevronLeft size={16} />
-                        Back to Feed
+                <div style={{ marginBottom: '2rem' }}>
+                    <Link href="/feed" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: 'var(--sub)', fontSize: '0.72rem', marginBottom: '1rem', textDecoration: 'none' }}>
+                        <ChevronLeft size={14} /> Back to Feed
                     </Link>
-                    <div>
-                        <h1 className="text-3xl font-bold tracking-tight text-gray-900 flex items-center gap-2">
-                            <span className="text-[#0055ff]">iNTEL</span><span className="text-[#ff5500]">lect</span> Admin
-                        </h1>
-                        <p className="text-sm text-gray-500 mt-1">Global platform metrics and moderation overview.</p>
-                    </div>
+                    <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.8rem', fontWeight: 900, color: 'var(--text)', marginBottom: '0.25rem' }}>
+                        INTEL<em style={{ fontStyle: 'italic', color: 'var(--gold)' }}>lect</em>{' '}
+                        <span style={{ color: 'var(--rust)' }}>Admin</span>
+                    </h1>
+                    <p style={{ fontSize: '0.72rem', color: 'var(--sub)' }}>Platform metrics, moderation, and user management.</p>
                 </div>
 
-                {/* Top KPI Cards */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-
-                    <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
-                        <div className="text-gray-400 mb-2"><Users size={20} /></div>
-                        <div className="text-3xl font-black text-gray-900">{usersCount.count || 0}</div>
-                        <div className="text-xs font-bold text-gray-500 uppercase tracking-wide mt-1">Total Users</div>
-                    </div>
-
-                    <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
-                        <div className="text-gray-400 mb-2"><Activity size={20} /></div>
-                        <div className="text-3xl font-black text-gray-900">{postsCount.count || 0}</div>
-                        <div className="text-xs font-bold text-gray-500 uppercase tracking-wide mt-1">Total Posts</div>
-                    </div>
-
-                    <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
-                        <div className="text-gray-400 mb-2"><MessageSquare size={20} /></div>
-                        <div className="text-3xl font-black text-gray-900">{commentsCount.count || 0}</div>
-                        <div className="text-xs font-bold text-gray-500 uppercase tracking-wide mt-1">Total Comments</div>
-                    </div>
-
-                </div>
-
-                {/* Secondary Metrics */}
-                <div className="grid md:grid-cols-3 gap-6 mb-8">
-
-                    {/* Debates & Content */}
-                    {/* Debates & Content */}
-                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 md:col-span-3">
-                        <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                            <Flame size={18} className="text-[#ff5500]" />
-                            Content & Debate Engagement
-                        </h3>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 text-center">
-                                <div className="text-2xl font-black text-gray-900">{debatesCount.count || 0}</div>
-                                <div className="text-[10px] font-bold text-gray-500 uppercase mt-1">Open Debates</div>
-                            </div>
-                            <div className="bg-[#ff5500]/10 p-4 rounded-xl border border-[#ff5500]/20 text-center">
-                                <div className="text-2xl font-black text-[#ff5500]">System Stable</div>
-                                <div className="text-[10px] font-bold text-[#ff5500]/70 uppercase mt-1 flex justify-center items-center gap-1">All Systems Operational</div>
-                            </div>
+                {/* KPI cards */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                    {[
+                        { label: 'Total Users', value: usersRes.count || 0, icon: <Users size={16} />, color: 'var(--violet-lt)' },
+                        { label: 'Total Posts', value: postsRes.count || 0, icon: <Activity size={16} />, color: 'var(--gold)' },
+                        { label: 'Total Comments', value: commentsRes.count || 0, icon: <MessageSquare size={16} />, color: 'var(--sub)' },
+                        { label: 'Open Debates', value: debatesRes.count || 0, icon: <Flame size={16} />, color: 'var(--rust)' },
+                    ].map(stat => (
+                        <div key={stat.label} style={{ background: 'var(--card)', border: '1px solid var(--bdr)', borderRadius: '4px', padding: '1rem' }}>
+                            <div style={{ color: stat.color, marginBottom: '0.4rem' }}>{stat.icon}</div>
+                            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.8rem', fontWeight: 900, color: 'var(--text)', lineHeight: 1 }}>{stat.value}</div>
+                            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.46rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--sub)', marginTop: '0.25rem' }}>{stat.label}</div>
                         </div>
-                    </div>
-
+                    ))}
                 </div>
 
-                {/* Global Moderation Action Box */}
-                <div className="bg-red-50 p-6 rounded-2xl border border-red-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div>
-                        <h3 className="font-bold text-red-900 text-lg">Global Moderation Controls</h3>
-                        <p className="text-sm text-red-700 mt-1">Actions taken here are irreversible. Ban users or remove debates platform-wide.</p>
+                {/* Manage Users */}
+                <div style={{ background: 'var(--card)', border: '1px solid var(--bdr)', borderRadius: '4px', padding: '1.25rem', marginBottom: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                        <Users size={16} style={{ color: 'var(--violet-lt)' }} />
+                        <h2 style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: '1rem', color: 'var(--text)' }}>Manage Users</h2>
                     </div>
-                    <div className="flex gap-2">
-                        <button className="bg-white text-red-700 border border-red-200 font-bold py-2 px-4 rounded-xl text-sm transition-colors hover:bg-red-100">
-                            Manage Users
-                        </button>
-                        <button className="bg-red-600 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors hover:bg-red-700">
-                            Review Flagged Content
-                        </button>
+                    <p style={{ fontSize: '0.65rem', color: 'var(--sub)' }}>Promote to admin, demote, or remove users from the platform.</p>
+                    <UserManagementPanel users={allUsers} />
+                </div>
+
+                {/* Flagged Content */}
+                <div style={{ background: 'var(--card)', border: '1px solid rgba(196,88,42,0.3)', borderRadius: '4px', padding: '1.25rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                        <BarChart3 size={16} style={{ color: 'var(--rust)' }} />
+                        <h2 style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: '1rem', color: 'var(--text)' }}>Content Moderation</h2>
                     </div>
+                    <p style={{ fontSize: '0.65rem', color: 'var(--sub)' }}>Review flagged comments and delete posts. Actions are irreversible.</p>
+                    <FlaggedContentPanel flaggedComments={flaggedComments} recentPosts={recentPosts} />
                 </div>
 
             </div>
