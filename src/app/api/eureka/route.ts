@@ -117,16 +117,18 @@ export async function POST(req: Request) {
             }
         }
 
-        // Insert feed post
-        const { error: insertError } = await supabase.from('posts').insert({
-            author_id: closingUserId,
-            content: `**Debate Concluded — ${debate.topic}**\n\n${summaryText}`,
-            is_eureka_summary: true
-        });
+        // Insert feed post ONLY if debate is public
+        if (!debate.is_private) {
+            const { error: insertError } = await supabase.from('posts').insert({
+                author_id: closingUserId,
+                content: `**Debate Concluded — ${debate.topic}**\n\n${summaryText}`,
+                is_eureka_summary: true
+            });
 
-        if (insertError) {
-            console.error("[EUREKA] Feed post insert failed:", insertError.message);
-            return NextResponse.json({ error: "An internal error occurred" }, { status: 500 });
+            if (insertError) {
+                console.error("[EUREKA] Feed post insert failed:", insertError.message);
+                return NextResponse.json({ error: "An internal error occurred" }, { status: 500 });
+            }
         }
 
         // Insert debate thread comment

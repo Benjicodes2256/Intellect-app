@@ -10,6 +10,7 @@ export default function CreateDebateButton() {
     const [context, setContext] = useState('')
     const [introduction, setIntroduction] = useState('')
     const [timeframe, setTimeframe] = useState(1)
+    const [isPrivate, setIsPrivate] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isGenerating, setIsGenerating] = useState(false)
 
@@ -47,11 +48,12 @@ export default function CreateDebateButton() {
 
         setIsSubmitting(true)
         try {
-            await createDebateAction(topic, timeframe, introduction)
+            await createDebateAction(topic, timeframe, introduction, isPrivate)
             setTopic('')
             setContext('')
             setIntroduction('')
             setTimeframe(1)
+            setIsPrivate(false)
             setIsCreateModalOpen(false)
             alert("Debate successfully launched!")
         } catch (error: any) {
@@ -136,6 +138,17 @@ export default function CreateDebateButton() {
                                     <option value={3}>3 Days (Standard)</option>
                                     <option value={7}>7 Days (Deep Dive)</option>
                                 </select>
+                            </div>
+
+                            <div className="mb-6 flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-xl">
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-800 uppercase">Private Debate</label>
+                                    <p className="text-[10px] text-gray-500 mt-0.5">Hidden from Arena. Invite-only access via link.</p>
+                                </div>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" className="sr-only peer" checked={isPrivate} onChange={(e) => setIsPrivate(e.target.checked)} disabled={isSubmitting} />
+                                    <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0055ff]"></div>
+                                </label>
                             </div>
 
                             <div className="flex justify-end gap-3 mt-4">

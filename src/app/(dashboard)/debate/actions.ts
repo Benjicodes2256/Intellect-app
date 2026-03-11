@@ -4,7 +4,7 @@ import { auth } from "@clerk/nextjs/server"
 import { createSupabaseClient } from "@/lib/supabase/client"
 import { revalidatePath } from "next/cache"
 
-export async function createDebateAction(topic: string, timeframeDays: number, introduction?: string) {
+export async function createDebateAction(topic: string, timeframeDays: number, introduction?: string, isPrivate: boolean = false) {
     const { userId, getToken } = await auth()
 
     if (!userId) throw new Error("Authentication required.")
@@ -31,6 +31,7 @@ export async function createDebateAction(topic: string, timeframeDays: number, i
         closes_at: closesAt.toISOString(),
         is_closed: false,
         duration_days: timeframeDays,
+        is_private: isPrivate,
     }
 
     if (trimmedIntro !== '') {

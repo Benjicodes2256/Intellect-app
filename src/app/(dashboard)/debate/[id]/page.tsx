@@ -111,9 +111,28 @@ export default async function DebateThreadPage({ params }: { params: Promise<{ i
                     </div>
 
                     {/* Topic */}
-                    <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.35rem', fontWeight: 900, color: 'var(--text)', lineHeight: 1.2, marginBottom: '0.6rem' }}>
-                        {debate.topic}
-                    </h2>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.6rem' }}>
+                        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.35rem', fontWeight: 900, color: 'var(--text)', lineHeight: 1.2 }}>
+                            {debate.topic}
+                        </h2>
+                        {debate.is_private && (
+                            <span style={{
+                                fontFamily: "'DM Mono', monospace",
+                                fontSize: '0.45rem',
+                                fontWeight: 700,
+                                letterSpacing: '0.1em',
+                                color: 'var(--sub)',
+                                textTransform: 'uppercase',
+                                padding: '0.2rem 0.4rem',
+                                background: 'rgba(255,255,255,0.05)',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '2px',
+                                flexShrink: 0,
+                            }}>
+                                Private
+                            </span>
+                        )}
+                    </div>
 
                     {/* Participants */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.65rem', color: 'var(--sub)', fontFamily: "'DM Mono', monospace", paddingBottom: '0.75rem', borderBottom: '1px solid var(--bdr)', marginBottom: '0.75rem' }}>

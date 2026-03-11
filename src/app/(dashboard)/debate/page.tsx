@@ -137,10 +137,21 @@ export default async function DebatePage() {
     const token = await getToken({ template: "supabase" })
     const supabase = createSupabaseClient(token || "")
 
-    const { data: debates, error } = await supabase
+    // Fetch user role
+    const { data: userData } = await supabase.from('users').select('role').eq('clerk_id', userId).single()
+    const isAdmin = userData?.role === 'admin'
+
+    let query = supabase
         .from('debates')
         .select('*, users!debates_creator_id_fkey(clerk_username), comments(id, stance)')
         .order('created_at', { ascending: false })
+
+    if (!isAdmin) {
+        // Normal users see public debates + their own private debates
+        query = query.or(`is_private.eq.false,creator_id.eq.${userId}`)
+    }
+
+    const { data: debates, error } = await query
 
     return (
         <div>
