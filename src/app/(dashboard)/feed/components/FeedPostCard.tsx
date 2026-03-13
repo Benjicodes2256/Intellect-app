@@ -17,7 +17,7 @@ export default function FeedPostCard({ post, currentUserId, isAdmin }: { post: a
     const comments = post.comments || []
     const sortedComments = [...comments].sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
 
-    const isLong = post.content.length > 200
+    const isLong = (post.content?.length || 0) > 200
 
     const handleReplyClick = (commentId: string, authorName: string, content: string) => {
         const event = new CustomEvent('inlineReplyRequested', {
