@@ -136,7 +136,7 @@ export default async function DebateThreadPage({ params }: { params: Promise<{ i
 
                     {/* Participants */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.65rem', color: 'var(--sub)', fontFamily: "'DM Mono', monospace", paddingBottom: '0.75rem', borderBottom: '1px solid var(--bdr)', marginBottom: '0.75rem' }}>
-                        <Users size={12} /> {comments?.length || 0} Participants
+                        <Users size={12} /> {new Set(comments?.map((c: any) => c.author_id) || []).size} Participants
                     </div>
 
                     {/* FOR vs AGAINST */}
@@ -226,7 +226,7 @@ export default async function DebateThreadPage({ params }: { params: Promise<{ i
                                         {comments.find((c: any) => c.id === comment.parent_id)?.users?.clerk_username || 'Participant'}
                                     </div>
                                     <div style={{ color: 'var(--sub)', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
-                                        {comments.find((c: any) => c.id === comment.parent_id)?.content || 'Original message removed'}
+                                        {(comments.find((c: any) => c.id === comment.parent_id)?.content || 'Original message removed').replace(/<[^>]*>?/gm, '')}
                                     </div>
                                 </div>
                             )}

@@ -155,7 +155,7 @@ export default function FeedPostCard({ post, currentUserId, isAdmin }: { post: a
                                             {sortedComments.find((c: any) => c.id === comment.parent_id)?.users?.clerk_username || 'Participant'}
                                         </div>
                                         <div style={{ fontSize: '0.6rem', color: 'var(--sub)', marginTop: '0.1rem', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
-                                            {sortedComments.find((c: any) => c.id === comment.parent_id)?.content || 'Original message removed'}
+                                            {(sortedComments.find((c: any) => c.id === comment.parent_id)?.content || 'Original message removed').replace(/<[^>]*>?/gm, '')}
                                         </div>
                                     </div>
                                 )}

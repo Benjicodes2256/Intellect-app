@@ -102,7 +102,7 @@ function DebateTile({ debate, isOwner, isAdmin }: { debate: any, isOwner: boolea
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.65rem', color: 'var(--sub)', marginBottom: '0.5rem', fontFamily: "'DM Mono', monospace" }}>
                 <Users size={12} />
-                {debate.comments?.length || 0} Participants · Created by {debate.users?.clerk_username || 'Unknown User'}
+                {new Set(debate.comments?.map((c: any) => c.author_id) || []).size} Participants · Created by {debate.users?.clerk_username || 'Unknown User'}
             </div>
 
             <DebateBar
