@@ -1,10 +1,11 @@
 "use client"
 
 import { useState } from 'react'
-import { CornerDownRight } from 'lucide-react'
+import { CornerDownRight, Mail } from 'lucide-react'
 import LikeButton from './LikeButton'
 import DeleteCommentButton from './DeleteCommentButton'
 import InlineDebateReplyForm from './InlineDebateReplyForm'
+import SendMessageModal from '@/components/messaging/SendMessageModal'
 
 interface Props {
     comment: any;
@@ -16,6 +17,7 @@ interface Props {
 
 export default function DebateCommentActions({ comment, debateId, userId, isClosed, isAdmin = false }: Props) {
     const [isReplying, setIsReplying] = useState(false)
+    const [msgModal, setMsgModal] = useState(false)
 
     const initialLikes = comment.likes?.length || 0;
     const initialUserLiked = comment.likes?.some((l: any) => l.user_id === userId) || false;
@@ -39,6 +41,16 @@ export default function DebateCommentActions({ comment, debateId, userId, isClos
                             Reply
                         </button>
                     )}
+
+                    {userId !== comment.author_id && (
+                        <button
+                            onClick={() => setMsgModal(true)}
+                            className="flex items-center gap-1.5 text-xs font-bold text-gray-500 hover:text-[#0055ff] transition-colors hover:bg-blue-50 px-2 py-1 -ml-2 rounded-md"
+                        >
+                            <Mail size={14} />
+                            Message
+                        </button>
+                    )}
                 </div>
 
                 {(userId === comment.author_id || isAdmin) && !isClosed && (
@@ -59,6 +71,13 @@ export default function DebateCommentActions({ comment, debateId, userId, isClos
                     />
                 </div>
             )}
+
+            <SendMessageModal
+                isOpen={msgModal}
+                onClose={() => setMsgModal(false)}
+                receiverId={comment.author_id}
+                receiverName={comment.users?.clerk_username || 'user'}
+            />
         </div>
     )
 }

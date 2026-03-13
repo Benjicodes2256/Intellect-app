@@ -1,8 +1,9 @@
 "use client"
 
 import { useState } from 'react'
-import { MessageSquareText, Share2, MessageCircleReply } from 'lucide-react'
+import { MessageSquareText, Share2, MessageCircleReply, Mail } from 'lucide-react'
 import { clsx } from 'clsx'
+import SendMessageModal from '@/components/messaging/SendMessageModal'
 import LikePostButton from './LikePostButton'
 import DeletePostButton from './DeletePostButton'
 import InlineCommentForm from './InlineCommentForm'
@@ -13,6 +14,7 @@ import RichText from '@/components/ui/RichText'
 export default function FeedPostCard({ post, currentUserId, isAdmin }: { post: any, currentUserId: string, isAdmin: boolean }) {
     const [showComments, setShowComments] = useState(false)
     const [expanded, setExpanded] = useState(false)
+    const [msgModal, setMsgModal] = useState<{ open: boolean, id: string, name: string }>({ open: false, id: '', name: '' })
 
     const comments = post.comments || []
     const sortedComments = [...comments].sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
@@ -66,7 +68,21 @@ export default function FeedPostCard({ post, currentUserId, isAdmin }: { post: a
                         </div>
                     </div>
                 </div>
-                {(currentUserId === post.author_id || isAdmin) && <DeletePostButton postId={post.id} />}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    {!isEureka && currentUserId !== post.author_id && (
+                        <button
+                            onClick={() => setMsgModal({ open: true, id: post.author_id, name: post.users?.clerk_username || 'user' })}
+                            style={{
+                                background: 'none', border: 'none', padding: '0.4rem', cursor: 'pointer',
+                                color: 'var(--sub)', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                            }}
+                            title="Send Message"
+                        >
+                            <Mail size={16} />
+                        </button>
+                    )}
+                    {(currentUserId === post.author_id || isAdmin) && <DeletePostButton postId={post.id} />}
+                </div>
             </div>
 
             {/* Content */}
@@ -193,6 +209,22 @@ export default function FeedPostCard({ post, currentUserId, isAdmin }: { post: a
                                         Reply
                                     </button>
 
+                                    {currentUserId !== comment.author_id && (
+                                        <button
+                                            onClick={() => setMsgModal({ open: true, id: comment.author_id, name: comment.users?.clerk_username || 'user' })}
+                                            style={{
+                                                display: 'flex', alignItems: 'center', gap: '0.25rem',
+                                                fontSize: '0.55rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
+                                                fontFamily: "'DM Mono', monospace", color: 'var(--sub)', background: 'none', border: 'none',
+                                                cursor: 'pointer', transition: 'color 0.2s',
+                                            }}
+                                            title="Send Message"
+                                        >
+                                            <Mail size={12} />
+                                            Message
+                                        </button>
+                                    )}
+
                                     {(currentUserId === comment.author_id || isAdmin) && (
                                         <div style={{ marginLeft: 'auto' }}>
                                             <DeletePostCommentButton commentId={comment.id} />
@@ -206,6 +238,13 @@ export default function FeedPostCard({ post, currentUserId, isAdmin }: { post: a
                     <InlineCommentForm postId={post.id} />
                 </div>
             )}
+
+            <SendMessageModal
+                isOpen={msgModal.open}
+                onClose={() => setMsgModal({ ...msgModal, open: false })}
+                receiverId={msgModal.id}
+                receiverName={msgModal.name}
+            />
         </div>
     )
 }
