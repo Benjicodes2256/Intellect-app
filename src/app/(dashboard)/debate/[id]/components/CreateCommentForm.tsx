@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Send } from 'lucide-react'
 import { clsx } from 'clsx'
 import { createCommentAction } from '../actions'
-import RichText from '@/components/ui/RichText'
+import Editor from '@/components/ui/Editor'
 
 export default function CreateCommentForm({ debateId }: { debateId: string }) {
     const [stance, setStance] = useState<'for' | 'against'>('for')
@@ -58,31 +58,22 @@ export default function CreateCommentForm({ debateId }: { debateId: string }) {
                     </button>
                 </div>
 
-                {/* Single Line Input */}
-                <div className="flex-1 relative w-full">
-                    <input
-                        type="text"
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
+                {/* Compact Argument Editor */}
+                <div className="flex-1 relative w-full bg-white rounded-[24px] border border-gray-100 shadow-sm focus-within:ring-2 focus-within:ring-[#0055ff]/10 transition-all">
+                    <Editor 
+                        value={content} 
+                        onChange={setContent}
                         placeholder="State your argument..."
-                        className="w-full bg-gray-100/80 border border-gray-200 focus:border-[#0055ff]/40 rounded-full px-4 py-2 pr-10 text-sm placeholder-gray-500 text-gray-900 outline-none transition-colors"
-                        disabled={isSubmitting}
-                        required
-                        autoComplete="off"
+                        minHeight="60px"
                     />
                     <button
                         type="submit"
                         disabled={isSubmitting || !content.trim()}
-                        className="absolute right-1 top-1/2 -translate-y-1/2 bg-[#ff5500] hover:bg-[#cc4400] text-white p-1.5 rounded-full transition-colors disabled:opacity-50 disabled:bg-[#ff5500]"
+                        className="absolute right-2 bottom-2 bg-[#ff5500] hover:bg-[#cc4400] text-white p-2 rounded-full transition-colors disabled:opacity-50 disabled:bg-[#ff5500]"
                         title="Send Argument"
                     >
-                        <Send size={14} className="ml-[1px]" />
+                        <Send size={16} className="ml-[1px]" />
                     </button>
-                    {content.includes('**') || content.includes('*') || content.includes('_') ? (
-                        <div className="absolute bottom-full mb-2 left-4 px-3 py-1 bg-white border border-gray-100 rounded-lg shadow-sm pointer-events-none fade-in">
-                            <RichText content={content} small />
-                        </div>
-                    ) : null}
                 </div>
             </div>
         </form>

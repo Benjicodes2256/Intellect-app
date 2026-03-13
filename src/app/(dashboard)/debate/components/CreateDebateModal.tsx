@@ -5,6 +5,8 @@ import { Flame } from 'lucide-react'
 import { clsx } from 'clsx'
 import { createDebateAction } from '../actions'
 import RichText from '@/components/ui/RichText'
+import Editor from '@/components/ui/Editor'
+import { marked } from 'marked'
 
 export default function CreateDebateButton() {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
@@ -15,7 +17,6 @@ export default function CreateDebateButton() {
     const [isPrivate, setIsPrivate] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isGenerating, setIsGenerating] = useState(false)
-    const [introViewMode, setIntroViewMode] = useState<'edit' | 'preview'>('edit')
 
     const handleGenerateIntro = async () => {
         if (!topic.trim()) {
@@ -38,8 +39,9 @@ export default function CreateDebateButton() {
                     : (data.error || "Failed to generate introduction.");
                 alert(errorMessage)
             } else {
-                setIntroduction(data.intro)
-                setIntroViewMode('preview')
+                // Convert Markdown from AI to HTML for the tip-tap editor
+                const htmlContent = marked.parse(data.intro)
+                setIntroduction(htmlContent as string)
             }
         } catch (error) {
             console.error(error)
@@ -120,52 +122,18 @@ export default function CreateDebateButton() {
                                 </div>
                             </div>
 
-                            {/* Introduction with Tabbed Swapper */}
+                            {/* Introduction WYSIWYG Editor */}
                             <div className="mb-6">
-                                <div className="flex items-center justify-between mb-2">
-                                    <label className="text-xs font-bold text-gray-700 uppercase text-[#0055ff]">Introduction (Optional)</label>
-                                    <div className="flex p-0.5 bg-gray-100 rounded-lg">
-                                        <button
-                                            type="button"
-                                            onClick={() => setIntroViewMode('edit')}
-                                            className={clsx(
-                                                "px-2 py-1 text-[10px] font-bold rounded-md transition-all",
-                                                introViewMode === 'edit' ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
-                                            )}
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setIntroViewMode('preview')}
-                                            className={clsx(
-                                                "px-2 py-1 text-[10px] font-bold rounded-md transition-all",
-                                                introViewMode === 'preview' ? "bg-white text-[#0055ff] shadow-sm" : "text-gray-500 hover:text-gray-700"
-                                            )}
-                                        >
-                                            Preview
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {introViewMode === 'preview' ? (
-                                    <div className="w-full h-28 p-3 bg-blue-50/30 border border-blue-200 rounded-xl overflow-y-auto">
-                                        {introduction ? (
-                                            <RichText content={introduction} small />
-                                        ) : (
-                                            <p className="text-sm text-gray-400 italic">No content to preview.</p>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <textarea
-                                        value={introduction}
-                                        onChange={(e) => setIntroduction(e.target.value)}
-                                        placeholder="Manually write an introduction or let Eureka generate one..."
-                                        className="w-full h-28 p-3 bg-blue-50/50 border border-blue-200 rounded-xl focus:outline-none focus:border-[#0055ff] resize-none text-sm text-gray-800"
-                                        disabled={isSubmitting}
+                                <label className="block text-xs font-bold text-gray-700 uppercase mb-2 text-[#0055ff]">Introduction (Optional)</label>
+                                <div className="bg-white rounded-xl">
+                                    <Editor 
+                                        value={introduction} 
+                                        onChange={setIntroduction}
+                                        placeholder="Eureka will generate this, or you can start typing bold/italic thoughts..."
+                                        minHeight="140px"
                                     />
-                                )}
-                                <p className="text-[10px] text-gray-400 mt-1">You may manually edit AI-generated text before launching.</p>
+                                </div>
+                                <p className="text-[10px] text-gray-400 mt-1">Format text live or let Eureka generate a professional summary.</p>
                             </div>
 
                             <div className="mb-6">

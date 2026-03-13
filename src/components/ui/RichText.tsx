@@ -7,6 +7,18 @@ import ReactMarkdown from 'react-markdown';
 export default function RichText({ content, small }: { content: string; small?: boolean }) {
     const baseFontSize = small ? '0.72rem' : '0.85rem';
 
+    const isHtml = content.trim().startsWith('<')
+
+    if (isHtml) {
+        return (
+            <div 
+                style={{ fontSize: baseFontSize, color: 'var(--text)', lineHeight: 1.7 }}
+                className="prose-html"
+                dangerouslySetInnerHTML={{ __html: content }}
+            />
+        )
+    }
+
     return (
         <div style={{ fontSize: baseFontSize }}>
             <ReactMarkdown
@@ -114,5 +126,5 @@ export default function RichText({ content, small }: { content: string; small?: 
                 {content}
             </ReactMarkdown>
         </div>
-    );
+    )
 }

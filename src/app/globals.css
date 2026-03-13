@@ -1,6 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
 @import "tailwindcss";
+@import "@tailwindcss/typography";
+
+/* custom prose styles for HTML content */
+.prose-html {
+  @apply prose prose-sm max-w-none;
+}
+.prose-html strong { @apply font-bold text-[var(--text)]; }
+.prose-html em { @apply italic text-[var(--ivory-dim)]; }
+.prose-html u { @apply underline text-[var(--text)]; }
+
 
 /* ── DESIGN TOKENS ── */
 :root {

@@ -3,13 +3,12 @@
 import { useState } from 'react'
 import { clsx } from 'clsx'
 import { createPostAction } from '../actions'
-import RichText from '@/components/ui/RichText'
+import Editor from '@/components/ui/Editor'
 
 export default function CreatePostForm() {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
     const [postContent, setPostContent] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const [showPreview, setShowPreview] = useState(false)
 
     const handleCreatePost = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -44,52 +43,14 @@ export default function CreatePostForm() {
 
                         <form onSubmit={handleCreatePost}>
                             <div className="mb-4">
-                                <div className="flex items-center justify-between mb-2">
-                                    <label className="text-xs font-bold text-gray-700 uppercase">Your Insight</label>
-                                    <div className="flex p-0.5 bg-gray-100 rounded-lg">
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPreview(false)}
-                                            className={clsx(
-                                                "px-2 py-1 text-[10px] font-bold rounded-md transition-all",
-                                                !showPreview ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
-                                            )}
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPreview(true)}
-                                            className={clsx(
-                                                "px-2 py-1 text-[10px] font-bold rounded-md transition-all",
-                                                showPreview ? "bg-white text-[#0055ff] shadow-sm" : "text-gray-500 hover:text-gray-700"
-                                            )}
-                                        >
-                                            Preview
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="relative">
-                                    {showPreview ? (
-                                        <div className="w-full h-32 p-3 border border-blue-100 bg-blue-50/20 rounded-xl overflow-y-auto">
-                                            {postContent ? (
-                                                <RichText content={postContent} />
-                                            ) : (
-                                                <p className="text-sm text-gray-400 italic">No content to preview.</p>
-                                            )}
-                                        </div>
-                                    ) : (
-                                        <textarea
-                                            value={postContent}
-                                            onChange={(e) => setPostContent(e.target.value)}
-                                            placeholder="What profound thought is on your mind?"
-                                            className="w-full h-32 p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0055ff] resize-none text-sm text-gray-900"
-                                            disabled={isSubmitting}
-                                            required
-                                            autoFocus
-                                        />
-                                    )}
+                                <label className="block text-xs font-bold text-gray-700 uppercase mb-2">Your Insight</label>
+                                <div className="bg-white rounded-xl">
+                                    <Editor 
+                                        value={postContent} 
+                                        onChange={setPostContent}
+                                        placeholder="What profound thought is on your mind?"
+                                        minHeight="140px"
+                                    />
                                 </div>
                             </div>
 
