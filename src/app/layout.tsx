@@ -13,6 +13,10 @@ export const metadata: Metadata = {
     statusBarStyle: 'default',
     title: 'Intellect',
   },
+  icons: {
+    icon: '/logo.png?v=2',
+    apple: '/logo.png?v=2',
+  },
 };
 
 import { PWAProvider } from '@/context/PWAContext';
