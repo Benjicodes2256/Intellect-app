@@ -55,9 +55,9 @@ export function BottomNav() {
                         <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
                         <span style={{
                             fontFamily: "'DM Mono', monospace",
-                            fontSize: '0.44rem',
+                            fontSize: 'var(--fs-xs)',
                             fontWeight: 500,
-                            letterSpacing: '0.1em',
+                            letterSpacing: '0.12em',
                             textTransform: 'uppercase',
                         }}>{item.name}</span>
                     </Link>

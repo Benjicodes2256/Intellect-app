@@ -17,7 +17,7 @@ function CharterBanner() {
             <h3 style={{
                 fontFamily: "'Playfair Display', serif",
                 fontWeight: 700,
-                fontSize: '0.85rem',
+                fontSize: 'var(--fs-sm)',
                 color: 'var(--text)',
                 display: 'flex',
                 alignItems: 'center',
@@ -29,7 +29,7 @@ function CharterBanner() {
             </h3>
 
             <ul style={{
-                fontSize: '0.72rem',
+                fontSize: 'var(--fs-sm)',
                 color: 'var(--sub)',
                 display: 'flex',
                 flexDirection: 'column',
@@ -76,14 +76,14 @@ export default async function InboxPage() {
         <div>
             {/* Page Header */}
             <div style={{ marginBottom: '1.25rem' }}>
-                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.48rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 'var(--fs-xs)', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <span style={{ width: 16, height: 1, background: 'var(--gold)', display: 'block', flexShrink: 0 }} />
                     Direct Messages
                 </div>
-                <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.8rem', fontWeight: 900, color: 'var(--text)', lineHeight: 0.95 }}>
+                <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'var(--fs-xl)', fontWeight: 900, color: 'var(--text)', lineHeight: 0.95 }}>
                     In<em style={{ fontStyle: 'italic', color: 'var(--gold)' }}>box</em>
                 </h1>
-                <p style={{ fontSize: '0.72rem', color: 'var(--sub)', marginTop: '0.5rem' }}>
+                <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--sub)', marginTop: '0.5rem' }}>
                     Direct messages self-destruct after 5 days automatically.
                 </p>
             </div>
@@ -95,7 +95,7 @@ export default async function InboxPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                 {messages?.length === 0 && (
                     <div style={{
-                        textAlign: 'center', fontSize: '0.8rem', color: 'var(--sub)',
+                        textAlign: 'center', fontSize: 'var(--fs-base)', color: 'var(--sub)',
                         padding: '2.5rem', background: 'var(--card)',
                         border: '1px dashed var(--bdr)', borderRadius: '2px', marginTop: '0.5rem',
                     }}>
@@ -108,7 +108,7 @@ export default async function InboxPage() {
                 ))}
 
                 {messages && messages.length > 0 && (
-                    <div style={{ textAlign: 'center', fontSize: '0.58rem', color: 'var(--sub)', padding: '1.5rem 0', borderTop: '1px solid var(--bdr)', marginTop: '0.5rem', fontFamily: "'DM Mono', monospace", letterSpacing: '0.08em' }}>
+                    <div style={{ textAlign: 'center', fontSize: 'var(--fs-xs)', color: 'var(--sub)', padding: '1.5rem 0', borderTop: '1px solid var(--bdr)', marginTop: '0.5rem', fontFamily: "'DM Mono', monospace", letterSpacing: '0.08em' }}>
                         No more messages. Time to dive back into a debate!
                     </div>
                 )}
