@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { MessageSquareText, Share2, MessageCircleReply } from 'lucide-react'
+import { clsx } from 'clsx'
 import LikePostButton from './LikePostButton'
 import DeletePostButton from './DeletePostButton'
 import InlineCommentForm from './InlineCommentForm'
@@ -70,10 +71,16 @@ export default function FeedPostCard({ post, currentUserId, isAdmin }: { post: a
 
             {/* Content */}
             <div style={{ marginTop: '0.75rem' }}>
-                {expanded || !isLong
-                    ? <RichText content={post.content} />
-                    : <RichText content={`${post.content.substring(0, 200)}...`} />
-                }
+                <div className={clsx(!expanded && isLong && "max-h-[220px] overflow-hidden relative")}>
+                    <RichText content={post.content} />
+                    {!expanded && isLong && (
+                        <div style={{ 
+                            position: 'absolute', bottom: 0, left: 0, right: 0, height: '60px', 
+                            background: 'linear-gradient(to top, var(--card), transparent)',
+                            pointerEvents: 'none' 
+                        }} />
+                    )}
+                </div>
                 {isLong && (
                     <button
                         onClick={() => setExpanded(!expanded)}
