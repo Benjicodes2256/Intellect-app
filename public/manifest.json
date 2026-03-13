@@ -1,0 +1,21 @@
+{
+  "name": "Intellect",
+  "short_name": "Intellect",
+  "description": "High-fidelity intellectual debate floor and social network.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0d0b",
+  "theme_color": "#0f0d0b",
+  "icons": [
+    {
+      "src": "/logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "/logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}

@@ -6,6 +6,13 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'Intellect — Where Great Minds Discuss, Debate & Appreciate',
   description: 'AI-powered intellectual debate platform. Start or join debates, earn reputation, grow.',
+  manifest: '/manifest.json',
+  themeColor: '#0f0d0b',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Intellect',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
