@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Flame } from 'lucide-react'
 import { createDebateAction } from '../actions'
+import RichText from '@/components/ui/RichText'
 
 export default function CreateDebateButton() {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
@@ -30,7 +31,10 @@ export default function CreateDebateButton() {
 
             const data = await response.json()
             if (!response.ok || data.error) {
-                alert(data.error || "Failed to generate introduction.")
+                const errorMessage = data.details 
+                    ? `${data.error}: ${data.details}` 
+                    : (data.error || "Failed to generate introduction.");
+                alert(errorMessage)
             } else {
                 setIntroduction(data.intro)
             }
@@ -123,6 +127,14 @@ export default function CreateDebateButton() {
                                     className="w-full h-28 p-3 bg-blue-50/50 border border-blue-200 rounded-xl focus:outline-none focus:border-[#0055ff] resize-none text-sm text-gray-800"
                                     disabled={isSubmitting}
                                 />
+                                {introduction && (
+                                    <div className="mt-3 p-3 bg-white border border-blue-100 rounded-xl">
+                                        <p className="text-[10px] font-bold text-[#0055ff] uppercase mb-2 tracking-wider">Eureka Preview</p>
+                                        <div className="max-h-32 overflow-y-auto">
+                                            <RichText content={introduction} small />
+                                        </div>
+                                    </div>
+                                )}
                                 <p className="text-[10px] text-gray-400 mt-1">You may manually edit AI-generated text before launching.</p>
                             </div>
 

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Send } from 'lucide-react'
 import { clsx } from 'clsx'
 import { createCommentAction } from '../actions'
+import RichText from '@/components/ui/RichText'
 
 export default function CreateCommentForm({ debateId }: { debateId: string }) {
     const [stance, setStance] = useState<'for' | 'against'>('for')
@@ -77,6 +78,11 @@ export default function CreateCommentForm({ debateId }: { debateId: string }) {
                     >
                         <Send size={14} className="ml-[1px]" />
                     </button>
+                    {content.includes('**') || content.includes('*') || content.includes('_') ? (
+                        <div className="absolute bottom-full mb-2 left-4 px-3 py-1 bg-white border border-gray-100 rounded-lg shadow-sm pointer-events-none fade-in">
+                            <RichText content={content} small />
+                        </div>
+                    ) : null}
                 </div>
             </div>
         </form>
