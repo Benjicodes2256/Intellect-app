@@ -1,9 +1,6 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 
-// Initialize bare Google Gen AI SDK
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
 // USE EDGE RUNTIME TO BYPASS 10-SECOND VERCEL NODE TIMEOUT
 export const runtime = 'edge';
 
@@ -16,9 +13,13 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Missing debate topic" }, { status: 400 });
         }
 
-        if (!process.env.GEMINI_API_KEY) {
-            return NextResponse.json({ error: "AI service unavailable" }, { status: 503 });
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            return NextResponse.json({ error: "AI service unavailable (API Key Missing)" }, { status: 503 });
         }
+
+        // Initialize SDK inside handler for Edge runtime reliability
+        const ai = new GoogleGenAI({ apiKey });
 
         // §4 — sanitise inputs
         const sanitisedTopic = String(topic).slice(0, 300);
@@ -65,7 +66,11 @@ export async function POST(req: Request) {
         return NextResponse.json({ intro: generatedIntro });
 
     } catch (e: any) {
-        console.error("[EUREKA INTRO] Fatal Error:", e?.message);
-        return NextResponse.json({ error: "An internal error occurred" }, { status: 500 });
+        console.error("[EUREKA INTRO] Fatal Error:", e?.message || e);
+        // Temporarily return specific details to help debug why it's failing
+        return NextResponse.json({ 
+            error: "An internal error occurred",
+            details: e?.message || String(e)
+        }, { status: 500 });
     }
 }

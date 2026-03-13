@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { GoogleGenAI } from '@google/genai';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
 
 export const runtime = 'edge';
 
@@ -63,9 +63,14 @@ export async function POST(req: Request) {
 
         if (!comments || comments.length === 0) {
             summaryText = "This debate was closed before any arguments were made.";
-        } else if (!process.env.GEMINI_API_KEY) {
-            summaryText = "Eureka could not generate a summary at this time. Please try again later.";
         } else {
+            const apiKey = process.env.GEMINI_API_KEY;
+            if (!apiKey) {
+                summaryText = "Eureka could not generate a summary at this time (API Key Missing).";
+            } else {
+                // Initialize SDK inside handler for Edge runtime reliability
+                const ai = new GoogleGenAI({ apiKey });
+
             const transcript = comments
                 .map((c: any) => `[${c.stance.toUpperCase()}] ${c.users?.clerk_username || 'Participant'}: ${c.content}`)
                 .join('\n');
@@ -116,6 +121,8 @@ export async function POST(req: Request) {
                 summaryText = "Eureka could not generate a summary at this time. The debate has been closed.";
             }
         }
+    }
+
 
         // Insert feed post ONLY if debate is public
         if (!debate.is_private) {
@@ -156,7 +163,10 @@ export async function POST(req: Request) {
         return NextResponse.json({ success: true });
 
     } catch (e: any) {
-        console.error("[EUREKA] Fatal Error:", e?.message);
-        return NextResponse.json({ error: "An internal error occurred" }, { status: 500 });
+        console.error("[EUREKA] Fatal Error:", e?.message || e);
+        return NextResponse.json({ 
+            error: "An internal error occurred",
+            details: e?.message || String(e)
+        }, { status: 500 });
     }
 }
