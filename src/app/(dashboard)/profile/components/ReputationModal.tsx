@@ -93,7 +93,7 @@ export default function ReputationModal({ isOpen, onClose, currentTierIndex, rep
                     </div>
 
                     {/* The Tiers List */}
-                    <div>
+                    <div className="pb-8">
                         <h3 className="text-xs font-bold uppercase tracking-widest text-[var(--sub)] font-mono mb-3 px-1">The 11 Intellectual Tiers</h3>
                         <div className="flex flex-col gap-2">
                             {[...REPUTATION_TIERS].reverse().map((tier, revIdx) => {
