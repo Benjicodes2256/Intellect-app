@@ -71,7 +71,7 @@ export default async function DebateThreadPage({ params }: { params: Promise<{ i
                     >
                         <ArrowLeft size={16} style={{ color: 'var(--sub)' }} />
                     </Link>
-                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 'var(--fs-xs)', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--gold)' }}>
+                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.48rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--gold)' }}>
                         Debate Arena
                     </div>
                     <div style={{ marginLeft: 'auto' }}>
@@ -88,7 +88,7 @@ export default async function DebateThreadPage({ params }: { params: Promise<{ i
                             background: 'rgba(196,88,42,0.1)', color: 'var(--rust)',
                             padding: '0.2rem 0.5rem', borderRadius: '2px',
                             border: '1px solid rgba(196,88,42,0.2)',
-                            fontFamily: "'DM Mono', monospace", fontSize: 'var(--fs-xs)', fontWeight: 700,
+                            fontFamily: "'DM Mono', monospace", fontSize: '0.48rem', fontWeight: 700,
                         }}>
                             <Flame size={11} />
                             {debate.rating || 0} Rating
@@ -96,7 +96,7 @@ export default async function DebateThreadPage({ params }: { params: Promise<{ i
                         <div style={{
                             display: 'flex', alignItems: 'center', gap: '0.3rem',
                             padding: '0.2rem 0.5rem', borderRadius: '2px',
-                            fontFamily: "'DM Mono', monospace", fontSize: 'var(--fs-xs)', fontWeight: 700,
+                            fontFamily: "'DM Mono', monospace", fontSize: '0.48rem', fontWeight: 700,
                             ...(isClosed
                                 ? { background: 'var(--surf)', color: 'var(--sub)', border: '1px solid var(--bdr)' }
                                 : { background: 'rgba(106,76,147,0.12)', color: 'var(--violet-lt)', border: '1px solid rgba(106,76,147,0.25)' }
@@ -112,13 +112,13 @@ export default async function DebateThreadPage({ params }: { params: Promise<{ i
 
                     {/* Topic */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.6rem' }}>
-                        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'var(--fs-xl)', fontWeight: 900, color: 'var(--text)', lineHeight: 1.2 }}>
+                        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.35rem', fontWeight: 900, color: 'var(--text)', lineHeight: 1.2 }}>
                             {debate.topic}
                         </h2>
                         {debate.is_private && (
                             <span style={{
                                 fontFamily: "'DM Mono', monospace",
-                                fontSize: 'var(--fs-xs)',
+                                fontSize: '0.45rem',
                                 fontWeight: 700,
                                 letterSpacing: '0.1em',
                                 color: 'var(--sub)',
@@ -135,19 +135,19 @@ export default async function DebateThreadPage({ params }: { params: Promise<{ i
                     </div>
 
                     {/* Participants */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: 'var(--fs-sm)', color: 'var(--sub)', fontFamily: "'DM Mono', monospace", paddingBottom: '0.75rem', borderBottom: '1px solid var(--bdr)', marginBottom: '0.75rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.65rem', color: 'var(--sub)', fontFamily: "'DM Mono', monospace", paddingBottom: '0.75rem', borderBottom: '1px solid var(--bdr)', marginBottom: '0.75rem' }}>
                         <Users size={12} /> {new Set(comments?.map((c: any) => c.author_id) || []).size} Participants
                     </div>
 
                     {/* FOR vs AGAINST */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
                         <div style={{ background: 'rgba(106,76,147,0.08)', padding: '0.75rem', borderRadius: '2px', border: '1px solid rgba(106,76,147,0.2)', textAlign: 'center' }}>
-                            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 'var(--fs-xs)', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--violet-lt)' }}>
+                            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.55rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--violet-lt)' }}>
                                 FOR ({displayForScore}%)
                             </div>
                         </div>
                         <div style={{ background: 'rgba(196,88,42,0.08)', padding: '0.75rem', borderRadius: '2px', border: '1px solid rgba(196,88,42,0.2)', textAlign: 'center' }}>
-                            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 'var(--fs-xs)', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--rust)' }}>
+                            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.55rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--rust)' }}>
                                 AGAINST ({displayAgainstScore}%)
                             </div>
                         </div>
@@ -157,7 +157,7 @@ export default async function DebateThreadPage({ params }: { params: Promise<{ i
 
             {/* Thread */}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '0.5rem', padding: '0 2px' }}>
-                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 'var(--fs-xs)', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--sub)', textAlign: 'center', paddingBottom: '0.5rem', opacity: 0.6 }}>
+                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.46rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--sub)', textAlign: 'center', paddingBottom: '0.5rem', opacity: 0.6 }}>
                     Live Arguments
                 </div>
 
@@ -174,10 +174,10 @@ export default async function DebateThreadPage({ params }: { params: Promise<{ i
                         overflow: 'hidden',
                     }}>
                         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: 'linear-gradient(90deg, var(--violet), var(--violet-lt))', opacity: 0.7 }} />
-                        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 'var(--fs-xs)', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--violet-lt)', marginBottom: '0.5rem', fontWeight: 700 }}>
+                        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.46rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--violet-lt)', marginBottom: '0.5rem', fontWeight: 700 }}>
                             Eureka System
                         </div>
-                        <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--sub)', lineHeight: 1.65 }}>
+                        <div style={{ fontSize: '0.78rem', color: 'var(--sub)', lineHeight: 1.65 }}>
                             Welcome to the Arena. The topic is{' '}
                             <span style={{ fontWeight: 700, color: 'var(--text)' }}>"{debate.topic}"</span>.
                             <br /><br />
@@ -189,12 +189,12 @@ export default async function DebateThreadPage({ params }: { params: Promise<{ i
                                     padding: '0.65rem',
                                     margin: '0 0 0.65rem',
                                     border: '1px solid var(--bdr)',
-                                    fontSize: 'var(--fs-sm)',
+                                    fontSize: '0.72rem',
                                 }}>
-                                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 'var(--fs-xs)', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '0.4rem' }}>
+                                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.46rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '0.4rem' }}>
                                         Debate Context
                                     </div>
-                                    <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--sub)', lineHeight: 1.6 }}>
+                                    <div style={{ fontSize: '0.72rem', color: 'var(--sub)', lineHeight: 1.6 }}>
                                         <RichText content={debate.introduction} small />
                                     </div>
                                 </div>
@@ -219,10 +219,10 @@ export default async function DebateThreadPage({ params }: { params: Promise<{ i
                                     borderLeft: `3px solid ${isMe ? 'var(--rust)' : 'var(--sub)'}`,
                                     background: isMe ? 'rgba(196,88,42,0.06)' : 'rgba(255,255,255,0.03)',
                                     maxWidth: '75%',
-                                    fontSize: 'var(--fs-xs)',
+                                    fontSize: '0.65rem',
                                     opacity: 0.85,
                                 }}>
-                                    <div style={{ fontWeight: 700, color: isMe ? 'var(--rust)' : 'var(--sub)', fontFamily: "'DM Mono', monospace", fontSize: 'var(--fs-xs)', marginBottom: '0.1rem' }}>
+                                    <div style={{ fontWeight: 700, color: isMe ? 'var(--rust)' : 'var(--sub)', fontFamily: "'DM Mono', monospace", fontSize: '0.5rem', marginBottom: '0.1rem' }}>
                                         {comments.find((c: any) => c.id === comment.parent_id)?.users?.clerk_username || 'Participant'}
                                     </div>
                                     <div style={{ color: 'var(--sub)', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
@@ -251,10 +251,10 @@ export default async function DebateThreadPage({ params }: { params: Promise<{ i
                                 )
                             }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.3rem', gap: '0.75rem' }}>
-                                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 'var(--fs-xs)', fontWeight: 700, color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.52rem', fontWeight: 700, color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                                         {comment.users?.clerk_username || 'Unknown User'}
                                         <span style={{
-                                            fontSize: 'var(--fs-xs)', padding: '0.1rem 0.35rem', borderRadius: '2px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em',
+                                            fontSize: '0.44rem', padding: '0.1rem 0.35rem', borderRadius: '2px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em',
                                             ...(comment.stance === 'for'
                                                 ? { background: 'rgba(106,76,147,0.15)', color: 'var(--violet-lt)' }
                                                 : { background: 'rgba(196,88,42,0.15)', color: 'var(--rust)' }
@@ -263,7 +263,7 @@ export default async function DebateThreadPage({ params }: { params: Promise<{ i
                                             {comment.stance}
                                         </span>
                                     </div>
-                                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 'var(--fs-xs)', color: 'var(--sub)', whiteSpace: 'nowrap', marginTop: '0.1rem', opacity: 0.7 }}>
+                                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.44rem', color: 'var(--sub)', whiteSpace: 'nowrap', marginTop: '0.1rem', opacity: 0.7 }}>
                                         {new Date(comment.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     </div>
                                 </div>
@@ -284,7 +284,7 @@ export default async function DebateThreadPage({ params }: { params: Promise<{ i
                                     <div style={{
                                         marginTop: '0.4rem', display: 'inline-flex', alignItems: 'center', gap: '0.25rem',
                                         background: 'rgba(106,76,147,0.1)', color: 'var(--violet-lt)',
-                                        fontSize: 'var(--fs-xs)', fontFamily: "'DM Mono', monospace", fontWeight: 700,
+                                        fontSize: '0.5rem', fontFamily: "'DM Mono', monospace", fontWeight: 700,
                                         padding: '0.2rem 0.5rem', borderRadius: '2px', width: '100%',
                                     }}>
                                         +{comment.eureka_points_awarded} Rep Points (Verified)
@@ -305,7 +305,7 @@ export default async function DebateThreadPage({ params }: { params: Promise<{ i
                         <div style={{
                             background: 'var(--surf)', borderRadius: '2px', padding: '1rem', textAlign: 'center',
                             border: '1px solid var(--bdr)',
-                            fontFamily: "'DM Mono', monospace", fontSize: 'var(--fs-sm)', color: 'var(--sub)', letterSpacing: '0.08em',
+                            fontFamily: "'DM Mono', monospace", fontSize: '0.62rem', color: 'var(--sub)', letterSpacing: '0.08em',
                         }}>
                             This debate is sealed.
                         </div>

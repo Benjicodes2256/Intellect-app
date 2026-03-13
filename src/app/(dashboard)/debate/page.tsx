@@ -28,9 +28,9 @@ function DebateBar({ scoreFor, scoreAgainst }: { scoreFor: number, scoreAgainst:
                 alignItems: 'center',
                 marginBottom: '0.5rem',
             }}>
-                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 'var(--fs-xs)', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--violet-lt)' }}>For ({percentageFor}%)</span>
-                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 'var(--fs-xs)', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--sub)' }}>Eureka Evaluation</span>
-                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 'var(--fs-xs)', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--rust)' }}>Against ({percentageAgainst}%)</span>
+                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.5rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--violet-lt)' }}>For ({percentageFor}%)</span>
+                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.46rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--sub)' }}>Eureka Evaluation</span>
+                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.5rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--rust)' }}>Against ({percentageAgainst}%)</span>
             </div>
             <div style={{ height: '3px', width: '100%', background: 'var(--bdr)', overflow: 'hidden', display: 'flex' }}>
                 <div style={{ height: '100%', background: 'var(--violet)', transition: 'width 1s', width: `${percentageFor}%` }} />
@@ -64,7 +64,7 @@ function DebateTile({ debate, isOwner, isAdmin }: { debate: any, isOwner: boolea
                         background: 'rgba(196,88,42,0.1)', color: 'var(--rust)',
                         padding: '0.2rem 0.5rem', borderRadius: '2px',
                         border: '1px solid rgba(196,88,42,0.2)',
-                        fontFamily: "'DM Mono', monospace", fontSize: 'var(--fs-xs)', fontWeight: 700, letterSpacing: '0.08em',
+                        fontFamily: "'DM Mono', monospace", fontSize: '0.5rem', fontWeight: 700, letterSpacing: '0.08em',
                     }}>
                         <Flame size={12} />
                         {debate.rating || 0} Rating
@@ -73,7 +73,7 @@ function DebateTile({ debate, isOwner, isAdmin }: { debate: any, isOwner: boolea
                     <div style={{
                         display: 'flex', alignItems: 'center', gap: '0.3rem',
                         padding: '0.2rem 0.5rem', borderRadius: '2px',
-                        fontFamily: "'DM Mono', monospace", fontSize: 'var(--fs-xs)', fontWeight: 700, letterSpacing: '0.08em',
+                        fontFamily: "'DM Mono', monospace", fontSize: '0.5rem', fontWeight: 700, letterSpacing: '0.08em',
                         ...(isClosed
                             ? { background: 'var(--surf)', color: 'var(--sub)', border: '1px solid var(--bdr)' }
                             : { background: 'rgba(106,76,147,0.12)', color: 'var(--violet-lt)', border: '1px solid rgba(106,76,147,0.25)' }
@@ -88,7 +88,7 @@ function DebateTile({ debate, isOwner, isAdmin }: { debate: any, isOwner: boolea
 
             <h2 style={{
                 fontFamily: "'Playfair Display', serif",
-                fontSize: 'var(--fs-lg)', fontWeight: 700,
+                fontSize: '1.1rem', fontWeight: 700,
                 color: 'var(--text)', lineHeight: 1.3, marginBottom: '0.6rem',
             }}>
                 {debate.topic}
@@ -100,7 +100,7 @@ function DebateTile({ debate, isOwner, isAdmin }: { debate: any, isOwner: boolea
                 </div>
             )}
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: 'var(--fs-xs)', color: 'var(--sub)', marginBottom: '0.5rem', fontFamily: "'DM Mono', monospace" }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.65rem', color: 'var(--sub)', marginBottom: '0.5rem', fontFamily: "'DM Mono', monospace" }}>
                 <Users size={12} />
                 {new Set(debate.comments?.map((c: any) => c.author_id) || []).size} Participants · Created by {debate.users?.clerk_username || 'Unknown User'}
             </div>
@@ -116,7 +116,7 @@ function DebateTile({ debate, isOwner, isAdmin }: { debate: any, isOwner: boolea
                     href={`/debate/${debate.id}`}
                     style={{
                         display: 'flex', alignItems: 'center', gap: '0.4rem',
-                        fontFamily: "'DM Sans', sans-serif", fontSize: 'var(--fs-sm)', fontWeight: 600,
+                        fontFamily: "'DM Sans', sans-serif", fontSize: '0.72rem', fontWeight: 600,
                         color: 'var(--gold)', border: '1px solid var(--gold)',
                         padding: '0.4rem 0.9rem', borderRadius: '2px',
                         textDecoration: 'none', transition: 'all 0.2s',
@@ -158,14 +158,14 @@ export default async function DebatePage() {
             {/* Page Header */}
             <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                 <div>
-                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 'var(--fs-xs)', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.48rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <span style={{ width: 16, height: 1, background: 'var(--gold)', display: 'block', flexShrink: 0 }} />
                         Intellectual Arena
                     </div>
-                    <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'var(--fs-xl)', fontWeight: 900, color: 'var(--text)', lineHeight: 0.95 }}>
+                    <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.8rem', fontWeight: 900, color: 'var(--text)', lineHeight: 0.95 }}>
                         Master<br /><em style={{ fontStyle: 'italic', color: 'var(--gold)' }}>Debates</em>
                     </h1>
-                    <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--sub)', marginTop: '0.5rem' }}>
+                    <p style={{ fontSize: '0.72rem', color: 'var(--sub)', marginTop: '0.5rem' }}>
                         Argue with logic, not emotion.
                     </p>
                 </div>
@@ -174,10 +174,10 @@ export default async function DebatePage() {
 
             {/* Debate list */}
             <div>
-                {error && <p style={{ color: 'var(--rust)', fontSize: 'var(--fs-base)' }}>Error loading debates: {error.message}</p>}
+                {error && <p style={{ color: 'var(--rust)', fontSize: '0.8rem' }}>Error loading debates: {error.message}</p>}
 
                 {debates?.length === 0 && !error && (
-                    <div style={{ textAlign: 'center', padding: '2.5rem', background: 'var(--card)', border: '1px dashed var(--bdr)', borderRadius: '2px', fontSize: 'var(--fs-base)', color: 'var(--sub)' }}>
+                    <div style={{ textAlign: 'center', padding: '2.5rem', background: 'var(--card)', border: '1px dashed var(--bdr)', borderRadius: '2px', fontSize: '0.8rem', color: 'var(--sub)' }}>
                         No active debates found. Be the first to start one!
                     </div>
                 )}
@@ -194,7 +194,7 @@ export default async function DebatePage() {
                     );
                 })}
 
-                <div style={{ textAlign: 'center', fontSize: 'var(--fs-xs)', color: 'var(--sub)', padding: '1.5rem 0', borderTop: '1px solid var(--bdr)', marginTop: '1.5rem', fontFamily: "'DM Mono', monospace", letterSpacing: '0.08em' }}>
+                <div style={{ textAlign: 'center', fontSize: '0.58rem', color: 'var(--sub)', padding: '1.5rem 0', borderTop: '1px solid var(--bdr)', marginTop: '1.5rem', fontFamily: "'DM Mono', monospace", letterSpacing: '0.08em' }}>
                     Make sure you have the facts straight.
                 </div>
             </div>

@@ -71,7 +71,7 @@ export default async function DashboardLayout({
                                 href="/admin"
                                 style={{
                                     fontFamily: "'DM Mono', monospace",
-                                    fontSize: 'var(--fs-xs)',
+                                    fontSize: '0.5rem',
                                     fontWeight: 700,
                                     letterSpacing: '0.12em',
                                     textTransform: 'uppercase',
@@ -88,7 +88,7 @@ export default async function DashboardLayout({
                         )}
                         <div style={{
                             fontFamily: "'DM Mono', monospace",
-                            fontSize: 'var(--fs-xs)',
+                            fontSize: '0.5rem',
                             fontWeight: 500,
                             letterSpacing: '0.12em',
                             textTransform: 'uppercase',

@@ -42,95 +42,62 @@ export default function InboxMessageCard({ msg, currentUserId }: { msg: any, cur
     }
 
     return (
-        <div style={{
-            background: 'var(--card)',
-            borderRadius: '2px',
-            border: '1px solid var(--bdr)',
-            padding: '1rem',
-            marginBottom: '0.75rem',
-            position: 'relative',
-            overflow: 'hidden',
-            transition: 'all 0.2s ease',
-            ...(isUnread && {
-                borderLeft: '3px solid var(--rust)',
-                background: 'rgba(196,88,42,0.03)'
-            }),
-            ...(isSentByMe && {
-                background: 'rgba(255,255,255,0.02)',
-                opacity: 0.9
-            })
-        }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <div style={{
-                        width: 32, height: 32, borderRadius: '2px',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: '#fff', fontWeight: 700, fontSize: 'var(--fs-xs)',
-                        background: isModerator
-                            ? 'linear-gradient(135deg, var(--rust), var(--gold))'
-                            : 'linear-gradient(135deg, var(--violet), var(--rust))',
-                        flexShrink: 0,
-                    }}>
+        <div className={clsx(
+            "bg-white rounded-xl shadow-sm border p-4 transition-all mb-3 relative overflow-hidden",
+            isUnread ? "border-l-4 border-l-[#ff5500] border-y-gray-100 border-r-gray-100" : "border-gray-100",
+            isSentByMe && "bg-gray-50/50" // Slight tint for messages we sent
+        )}>
+            <div className="flex justify-between items-start mb-2">
+                <div className="flex items-center gap-2">
+                    <div className={clsx(
+                        "w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs",
+                        isModerator ? "bg-gradient-to-tr from-gray-900 to-gray-700" : "bg-gradient-to-tr from-[#0055ff] to-[#ff5500]"
+                    )}>
                         {displayUsername.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                        <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                            {isSentByMe ? <span style={{ color: 'var(--sub)', fontSize: 'var(--fs-xs)', fontWeight: 400 }}>To:</span> : null}
+                        <div className="font-bold text-sm text-gray-900 flex items-center gap-1">
+                            {isSentByMe ? <span className="text-gray-400 text-xs font-normal mr-1">To:</span> : null}
                             {displayUsername}
-                            {isModerator && (
-                                <span style={{ background: 'var(--rust)', color: '#fff', fontSize: 'var(--fs-xs)', padding: '0.15rem 0.4rem', borderRadius: '2px', fontFamily: "'DM Mono', monospace", letterSpacing: '0.06em', textTransform: 'uppercase' }}>System</span>
-                            )}
+                            {isModerator && <span className="bg-gray-900 text-white text-[10px] px-1.5 py-0.5 rounded-sm font-bold">System</span>}
                         </div>
-                        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--sub)', fontFamily: "'DM Mono', monospace" }}>
+                        <div className="text-xs text-gray-400 mb-1">
                             {new Date(msg.created_at).toLocaleDateString()}
                         </div>
                     </div>
                 </div>
+
                 <DeleteMessageButton messageId={msg.id} />
             </div>
 
-            <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', lineHeight: 1.6, marginBottom: '1rem', paddingLeft: '2.5rem', whiteSpace: 'pre-wrap' }}>
+            <div className="text-sm text-gray-800 leading-relaxed mb-4 pl-10 whitespace-pre-wrap">
                 {msg.content}
             </div>
 
             {!isModerator && !isSentByMe && (
-                <div style={{ paddingLeft: '2.5rem', borderTop: '1px dashed var(--bdr)', paddingTop: '0.75rem', marginTop: '0.75rem' }}>
+                <div className="pl-10 border-t border-gray-100 pt-3 mt-3">
                     {!replyOpen ? (
                         <button
                             onClick={() => setReplyOpen(true)}
-                            style={{
-                                display: 'flex', alignItems: 'center', gap: '0.35rem',
-                                fontSize: 'var(--fs-xs)', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
-                                fontFamily: "'DM Mono', monospace", color: 'var(--gold)', background: 'none', border: 'none',
-                                cursor: 'pointer',
-                            }}
+                            className="flex items-center gap-1.5 text-xs font-semibold text-[#0055ff] hover:text-blue-800 transition-colors"
                         >
                             <Reply size={14} /> Reply
                         </button>
                     ) : (
-                        <form onSubmit={handleReply} style={{ display: 'flex', gap: '0.5rem', width: '100%' }}>
+                        <form onSubmit={handleReply} className="mt-2 flex gap-2 w-full animate-in slide-in-from-top-2 duration-300">
                             <input
                                 type="text"
                                 value={replyContent}
                                 onChange={(e) => setReplyContent(e.target.value)}
                                 disabled={isSending}
                                 placeholder={`Reply to ${displayUsername}...`}
-                                style={{
-                                    flex: 1, fontSize: 'var(--fs-sm)', background: 'var(--surf)',
-                                    border: '1px solid var(--bdr)', borderRadius: '2px',
-                                    padding: '0.5rem 0.75rem', color: 'var(--text)', outline: 'none'
-                                }}
+                                className="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-2 bg-gray-50 focus:bg-white focus:outline-none focus:border-[#0055ff] focus:ring-2 focus:ring-[#0055ff]/10 transition-all"
                                 required
                             />
                             <button
                                 type="submit"
                                 disabled={isSending}
-                                style={{
-                                    background: 'var(--violet)', color: '#fff',
-                                    padding: '0 1rem', borderRadius: '2px', border: 'none',
-                                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    opacity: isSending ? 0.5 : 1
-                                }}
+                                className="bg-[#0055ff] text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center disabled:opacity-50"
                             >
                                 <Send size={16} />
                             </button>

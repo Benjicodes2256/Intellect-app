@@ -29,7 +29,7 @@ export default function ProfilePage() {
 
     if (!isLoaded || !user || isLoadingMetrics) {
         return (
-            <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--sub)', fontFamily: "'DM Mono', monospace", fontSize: 'var(--fs-xs)', letterSpacing: '0.08em' }}>
+            <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--sub)', fontFamily: "'DM Mono', monospace", fontSize: '0.7rem', letterSpacing: '0.08em' }}>
                 Loading profile...
             </div>
         )
@@ -55,21 +55,21 @@ export default function ProfilePage() {
             {/* Page Header */}
             <div style={{ marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
-                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 'var(--fs-xs)', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.48rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <span style={{ width: 16, height: 1, background: 'var(--gold)', display: 'block', flexShrink: 0 }} />
                         Identity
                     </div>
-                    <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'var(--fs-xl)', fontWeight: 900, color: 'var(--text)', lineHeight: 0.95 }}>
+                    <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.8rem', fontWeight: 900, color: 'var(--text)', lineHeight: 0.95 }}>
                         Pro<em style={{ fontStyle: 'italic', color: 'var(--gold)' }}>file</em>
                     </h1>
-                    <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--sub)', marginTop: '0.5rem' }}>
+                    <p style={{ fontSize: '0.72rem', color: 'var(--sub)', marginTop: '0.5rem' }}>
                         Manage your identity and track your logic.
                     </p>
                 </div>
                 <SignOutButton>
                     <button style={{
                         fontFamily: "'DM Mono', monospace",
-                        fontSize: 'var(--fs-xs)',
+                        fontSize: '0.52rem',
                         fontWeight: 500,
                         letterSpacing: '0.1em',
                         textTransform: 'uppercase',
@@ -95,10 +95,10 @@ export default function ProfilePage() {
                         style={{ width: 56, height: 56, borderRadius: '50%', border: '2px solid var(--gold)', flexShrink: 0 }}
                     />
                     <div>
-                        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--text)', lineHeight: 1.2 }}>
+                        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.15rem', fontWeight: 700, color: 'var(--text)', lineHeight: 1.2 }}>
                             {user.fullName || "Intellectual User"}
                         </h2>
-                        <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--sub)', fontFamily: "'DM Mono', monospace", marginTop: '0.1rem' }}>
+                        <p style={{ fontSize: '0.68rem', color: 'var(--sub)', fontFamily: "'DM Mono', monospace", marginTop: '0.1rem' }}>
                             @{user.username || user.firstName?.toLowerCase() || 'user'}
                         </p>
                     </div>
@@ -110,7 +110,7 @@ export default function ProfilePage() {
                         { Icon: MapPin, text: 'Earth (Location pending)' },
                         { Icon: Briefcase, text: 'Professional Thinker' },
                     ].map(({ Icon, text }) => (
-                        <div key={text} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: 'var(--fs-sm)', color: 'var(--sub)' }}>
+                        <div key={text} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78rem', color: 'var(--sub)' }}>
                             <Icon size={14} style={{ color: 'var(--rust)', flexShrink: 0 }} />
                             {text}
                         </div>
@@ -127,21 +127,21 @@ export default function ProfilePage() {
                         onMouseOut={(e) => e.currentTarget.style.background = 'rgba(106,76,147,0.08)'}
                     >
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 'var(--fs-xs)', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--violet-lt)' }}>Reputation Tier</span>
+                            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.46rem', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--violet-lt)' }}>Reputation Tier</span>
                             <Award size={14} style={{ color: 'var(--violet-lt)' }} />
                         </div>
                         <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.4rem', fontWeight: 900, color: 'var(--text)' }}>
                             {metrics?.calculatedTier?.tierName || 'Observer'}
                         </div>
                         <div style={{ marginTop: '0.5rem' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: "'DM Mono', monospace", fontSize: 'var(--fs-xs)', color: 'var(--sub)', marginBottom: '0.3rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: "'DM Mono', monospace", fontSize: '0.44rem', color: 'var(--sub)', marginBottom: '0.3rem' }}>
                                 <span>{metrics?.calculatedTier?.reputationScore || 0} PTS</span>
                                 <span>{metrics?.calculatedTier?.isMax ? 'MAX TIER' : `${metrics?.calculatedTier?.pointsToNext || 0} TO NEXT`}</span>
                             </div>
                             <div style={{ width: '100%', background: 'var(--bdr)', borderRadius: '1px', height: '3px', overflow: 'hidden' }}>
                                 <div style={{ background: 'var(--violet)', height: '100%', width: `${metrics?.calculatedTier?.progressPercentage || 0}%`, transition: 'width 0.5s' }} />
                             </div>
-                            <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 'var(--fs-xs)', color: 'var(--sub)', marginTop: '0.4rem', fontStyle: 'italic', lineHeight: 1.5 }}>
+                            <p style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.46rem', color: 'var(--sub)', marginTop: '0.4rem', fontStyle: 'italic', lineHeight: 1.5 }}>
                                 {metrics?.calculatedTier?.isMax
                                     ? "You have reached the Zenith."
                                     : `"Keep commenting to reach ${REPUTATION_TIERS[(metrics?.calculatedTier?.tierIndex || 0) + 1]} status."`}
@@ -152,13 +152,13 @@ export default function ProfilePage() {
                     {/* Truth Score */}
                     <div style={{ background: 'rgba(196,88,42,0.08)', padding: '0.85rem', borderRadius: '2px', border: '1px solid rgba(196,88,42,0.2)', opacity: 0.6 }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 'var(--fs-xs)', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--rust)' }}>Truth Score</span>
+                            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.46rem', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--rust)' }}>Truth Score</span>
                             <ShieldAlert size={14} style={{ color: 'var(--rust)' }} />
                         </div>
-                        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.4rem', fontWeight: 900, color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <span style={{ fontSize: 'var(--fs-xs)', fontFamily: "'DM Mono', monospace", letterSpacing: '0.1em', color: 'var(--rust)', lineHeight: 1.2 }}>[COMING SOON]</span>
+                        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.4rem', fontWeight: 900, color: 'var(--text)', display: 'flex', alignItems: 'center' }}>
+                            <span style={{ fontSize: '0.7rem', fontFamily: "'DM Mono', monospace", letterSpacing: '0.1em', color: 'var(--rust)' }}>[COMING SOON]</span>
                         </div>
-                        <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 'var(--fs-xs)', color: 'var(--sub)', marginTop: '0.5rem', lineHeight: 1.6 }}>
+                        <p style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.46rem', color: 'var(--sub)', marginTop: '0.5rem', lineHeight: 1.6 }}>
                             The Eureka AI will soon begin evaluating logical consistency to form your Truth Score.
                         </p>
                     </div>
@@ -171,11 +171,11 @@ export default function ProfilePage() {
                 className="tour-suggestion-box"
                 style={{ background: 'var(--card)', padding: '1.25rem', borderRadius: '2px', border: '1px solid var(--bdr)', marginBottom: '2rem' }}
             >
-                <h3 style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: 'var(--fs-base)', color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                <h3 style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: '0.95rem', color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                     <Send size={16} style={{ color: 'var(--sub)' }} />
                     Send a Suggestion
                 </h3>
-                <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--sub)', marginBottom: '0.85rem' }}>
+                <p style={{ fontSize: '0.68rem', color: 'var(--sub)', marginBottom: '0.85rem' }}>
                     Have an idea to improve the platform? Send it directly to Admin.
                 </p>
 
@@ -191,7 +191,7 @@ export default function ProfilePage() {
                         border: '1px solid var(--bdr)',
                         borderRadius: '2px',
                         padding: '0.65rem',
-                        fontSize: 'var(--fs-base)',
+                        fontSize: '0.8rem',
                         color: 'var(--text)',
                         minHeight: '100px',
                         resize: 'vertical',
@@ -212,7 +212,7 @@ export default function ProfilePage() {
                             color: '#fff',
                             fontFamily: "'DM Sans', sans-serif",
                             fontWeight: 600,
-                            fontSize: 'var(--fs-sm)',
+                            fontSize: '0.75rem',
                             letterSpacing: '0.06em',
                             textTransform: 'uppercase',
                             padding: '0.5rem 1.25rem',
