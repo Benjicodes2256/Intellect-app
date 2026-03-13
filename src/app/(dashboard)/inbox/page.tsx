@@ -51,6 +51,8 @@ function CharterBanner() {
     )
 }
 
+import PWAAnnouncement from './components/PWAAnnouncement'
+
 export default async function InboxPage() {
     const { userId, getToken } = await auth()
     if (!userId) redirect('/sign-in')
@@ -87,6 +89,8 @@ export default async function InboxPage() {
             </div>
 
             <CharterBanner />
+
+            <PWAAnnouncement />
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                 {messages?.length === 0 && (

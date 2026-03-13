@@ -2,14 +2,13 @@ import { currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import { Info, Flame, MessageSquare, Inbox } from 'lucide-react'
 
+import InstallPWAStep from './InstallPWAStep'
+
 export default async function OnboardingPage() {
     const user = await currentUser()
     if (!user) {
         redirect('/sign-in')
     }
-
-    // NOTE: We will check the DB if the user has already agreed to the charter eventually.
-    // For now, this acts as a mandatory visual gate they must accept.
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col items-center p-6 pb-24">
@@ -21,6 +20,8 @@ export default async function OnboardingPage() {
                     </div>
                     <p className="text-gray-500 text-sm">The platform for great minds to discuss, debate, and appreciate.</p>
                 </div>
+
+                <InstallPWAStep />
 
                 <div className="space-y-6 mb-8">
                     <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
