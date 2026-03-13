@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Flame } from 'lucide-react'
+import { clsx } from 'clsx'
 import { createDebateAction } from '../actions'
 import RichText from '@/components/ui/RichText'
 
@@ -14,6 +15,7 @@ export default function CreateDebateButton() {
     const [isPrivate, setIsPrivate] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isGenerating, setIsGenerating] = useState(false)
+    const [introViewMode, setIntroViewMode] = useState<'edit' | 'preview'>('edit')
 
     const handleGenerateIntro = async () => {
         if (!topic.trim()) {
@@ -37,6 +39,7 @@ export default function CreateDebateButton() {
                 alert(errorMessage)
             } else {
                 setIntroduction(data.intro)
+                setIntroViewMode('preview')
             }
         } catch (error) {
             console.error(error)
@@ -117,23 +120,50 @@ export default function CreateDebateButton() {
                                 </div>
                             </div>
 
-                            {/* Make the UI pop if they've generated an Intro */}
+                            {/* Introduction with Tabbed Swapper */}
                             <div className="mb-6">
-                                <label className="block text-xs font-bold text-gray-700 uppercase mb-2 text-[#0055ff]">Introduction (Optional)</label>
-                                <textarea
-                                    value={introduction}
-                                    onChange={(e) => setIntroduction(e.target.value)}
-                                    placeholder="Manually write an introduction or let Eureka generate one..."
-                                    className="w-full h-28 p-3 bg-blue-50/50 border border-blue-200 rounded-xl focus:outline-none focus:border-[#0055ff] resize-none text-sm text-gray-800"
-                                    disabled={isSubmitting}
-                                />
-                                {introduction && (
-                                    <div className="mt-3 p-3 bg-white border border-blue-100 rounded-xl">
-                                        <p className="text-[10px] font-bold text-[#0055ff] uppercase mb-2 tracking-wider">Eureka Preview</p>
-                                        <div className="max-h-32 overflow-y-auto">
-                                            <RichText content={introduction} small />
-                                        </div>
+                                <div className="flex items-center justify-between mb-2">
+                                    <label className="text-xs font-bold text-gray-700 uppercase text-[#0055ff]">Introduction (Optional)</label>
+                                    <div className="flex p-0.5 bg-gray-100 rounded-lg">
+                                        <button
+                                            type="button"
+                                            onClick={() => setIntroViewMode('edit')}
+                                            className={clsx(
+                                                "px-2 py-1 text-[10px] font-bold rounded-md transition-all",
+                                                introViewMode === 'edit' ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
+                                            )}
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setIntroViewMode('preview')}
+                                            className={clsx(
+                                                "px-2 py-1 text-[10px] font-bold rounded-md transition-all",
+                                                introViewMode === 'preview' ? "bg-white text-[#0055ff] shadow-sm" : "text-gray-500 hover:text-gray-700"
+                                            )}
+                                        >
+                                            Preview
+                                        </button>
                                     </div>
+                                </div>
+
+                                {introViewMode === 'preview' ? (
+                                    <div className="w-full h-28 p-3 bg-blue-50/30 border border-blue-200 rounded-xl overflow-y-auto">
+                                        {introduction ? (
+                                            <RichText content={introduction} small />
+                                        ) : (
+                                            <p className="text-sm text-gray-400 italic">No content to preview.</p>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <textarea
+                                        value={introduction}
+                                        onChange={(e) => setIntroduction(e.target.value)}
+                                        placeholder="Manually write an introduction or let Eureka generate one..."
+                                        className="w-full h-28 p-3 bg-blue-50/50 border border-blue-200 rounded-xl focus:outline-none focus:border-[#0055ff] resize-none text-sm text-gray-800"
+                                        disabled={isSubmitting}
+                                    />
                                 )}
                                 <p className="text-[10px] text-gray-400 mt-1">You may manually edit AI-generated text before launching.</p>
                             </div>
