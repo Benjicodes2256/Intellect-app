@@ -51,13 +51,14 @@ export async function POST(req: Request) {
         `;
 
         const response = await ai.models.generateContent({
-            model: 'gemini-1.5-flash',
+            model: 'models/gemini-1.5-flash',
             contents: prompt,
         });
 
         const generatedIntro = response.text || "";
 
         if (!generatedIntro) {
+            console.error("[EUREKA INTRO] Empty response from Gemini");
             return NextResponse.json({ error: "Eureka failed to generate an introduction." }, { status: 500 });
         }
 

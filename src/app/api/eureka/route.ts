@@ -102,7 +102,7 @@ export async function POST(req: Request) {
 
             try {
                 const response = await ai.models.generateContent({
-                    model: 'gemini-1.5-flash',
+                    model: 'models/gemini-1.5-flash',
                     contents: prompt,
                 });
                 const raw = response.text?.trim() || '';
