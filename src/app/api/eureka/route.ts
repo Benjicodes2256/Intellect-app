@@ -111,10 +111,20 @@ export async function POST(req: Request) {
                     contents: prompt,
                 });
                 const raw = response.text?.trim() || '';
-                if (raw.length < 50) {
+                
+                // Strip markdown noise (horizontal rules, code blocks, excessive stars)
+                const clean = raw
+                    .replace(/^[`\s]*|[`\s]*$/g, '') // Strip wrapping backticks
+                    .replace(/^markdown\n/i, '')     // Strip "markdown" language tag
+                    .replace(/\*\*\*+/g, '')         // Strip *** horizontal rules
+                    .replace(/---+/g, '')           // Strip --- horizontal rules
+                    .replace(/___+/g, '')           // Strip ___ horizontal rules
+                    .trim();
+
+                if (clean.length < 50) {
                     summaryText = "Eureka attempted to summarise this debate but received an incomplete response. The debate has been closed.";
                 } else {
-                    summaryText = raw;
+                    summaryText = clean;
                 }
             } catch (apiError: any) {
                 console.error("[EUREKA] Gemini API Error:", apiError?.message);

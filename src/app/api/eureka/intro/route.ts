@@ -56,14 +56,23 @@ export async function POST(req: Request) {
             contents: prompt,
         });
 
-        const generatedIntro = response.text || "";
+        const rawIntro = response.text || "";
 
-        if (!generatedIntro) {
+        // Strip markdown noise (horizontal rules, code blocks, excessive stars)
+        const cleanIntro = rawIntro
+            .replace(/^[`\s]*|[`\s]*$/g, '') // Strip wrapping backticks
+            .replace(/^markdown\n/i, '')     // Strip "markdown" language tag
+            .replace(/\*\*\*+/g, '')         // Strip *** horizontal rules
+            .replace(/---+/g, '')           // Strip --- horizontal rules
+            .replace(/___+/g, '')           // Strip ___ horizontal rules
+            .trim();
+
+        if (!cleanIntro) {
             console.error("[EUREKA INTRO] Empty response from Gemini");
             return NextResponse.json({ error: "Eureka failed to generate an introduction." }, { status: 500 });
         }
 
-        return NextResponse.json({ intro: generatedIntro });
+        return NextResponse.json({ intro: cleanIntro });
 
     } catch (e: any) {
         console.error("[EUREKA INTRO] Fatal Error:", e?.message || e);
