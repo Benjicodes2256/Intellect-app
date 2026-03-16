@@ -6,6 +6,7 @@ import Link from 'next/link'
 import OnboardingTour from '@/components/layout/OnboardingTour'
 import ThemeToggle from '@/components/layout/ThemeToggle'
 import { calculateReputationTier } from '@/lib/reputation'
+import InAppBrowserPrompt from './components/InAppBrowserPrompt'
 
 export default async function DashboardLayout({
     children,
@@ -111,6 +112,7 @@ export default async function DashboardLayout({
             </main>
 
             <OnboardingTour userId={userId} completedOnboarding={completedOnboarding} />
+            <InAppBrowserPrompt />
 
             {/* Mobile-first bottom navigation */}
             <BottomNav />

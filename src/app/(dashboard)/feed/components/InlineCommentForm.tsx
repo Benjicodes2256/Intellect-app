@@ -40,20 +40,20 @@ export default function InlineCommentForm({ postId }: { postId: string }) {
     const cancelReply = () => setReplyingTo(null)
 
     return (
-        <form onSubmit={handleSubmit} className="mt-4 pt-4 border-t border-gray-100">
-            <div className="flex flex-col relative bg-gray-50 border border-gray-200 rounded-2xl overflow-hidden focus-within:ring-2 focus-within:ring-[#0055ff]/20 focus-within:border-[#0055ff] transition-all">
+        <form onSubmit={handleSubmit} className="mt-4 pt-4 border-t border-[var(--bdr)]">
+            <div className="flex flex-col relative bg-[var(--surf)] border border-[var(--bdr)] rounded-2xl overflow-hidden focus-within:ring-2 focus-within:ring-[var(--gold)]/20 focus-within:border-[var(--gold)] transition-all">
 
                 {replyingTo && (
-                    <div className="flex justify-between items-start bg-black/5 mx-2 mt-2 p-2 px-3 rounded-lg border-l-4 border-[#0055ff] animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    <div className="flex justify-between items-start bg-black/20 mx-2 mt-2 p-2 px-3 rounded-lg border-l-4 border-[var(--gold)] animate-in fade-in slide-in-from-bottom-2 duration-300">
                         <div className="flex flex-col overflow-hidden w-full pr-2">
-                            <div className="text-xs font-bold text-[#0055ff]">
+                            <div className="text-xs font-bold text-[var(--gold)] font-mono uppercase tracking-wider">
                                 {replyingTo.authorName}
                             </div>
-                            <div className="text-xs text-gray-600 truncate mt-0.5 opacity-80">
-                                {replyingTo.content}
+                            <div className="text-xs text-[var(--sub)] truncate mt-0.5 opacity-90 italic">
+                                "{replyingTo.content.replace(/<[^>]*>?/gm, '')}"
                             </div>
                         </div>
-                        <button type="button" onClick={cancelReply} className="text-gray-400 hover:text-gray-900 transition-colors p-1 shrink-0 bg-black/5 hover:bg-black/10 rounded-full" title="Cancel Reply">
+                        <button type="button" onClick={cancelReply} className="text-[var(--sub)] hover:text-[var(--text)] transition-colors p-1 shrink-0 bg-black/5 hover:bg-black/10 rounded-full" title="Cancel Reply">
                             <X size={12} />
                         </button>
                     </div>
@@ -64,14 +64,14 @@ export default function InlineCommentForm({ postId }: { postId: string }) {
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                         placeholder={replyingTo ? "Write your reply..." : "Add to the discussion..."}
-                        className="w-full min-h-[40px] max-h-[120px] p-3 pr-12 bg-transparent border-transparent focus:ring-0 focus:border-transparent outline-none resize-y text-xs text-gray-900 transition-all"
+                        className="w-full min-h-[40px] max-h-[120px] p-3 pr-12 bg-transparent border-transparent focus:ring-0 focus:border-transparent outline-none resize-y text-xs text-[var(--text)] transition-all"
                         disabled={isSubmitting}
                         required
                     />
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="absolute right-2 bottom-2 bg-[#0055ff] hover:bg-blue-700 text-white p-1.5 rounded-lg transition-colors shadow-sm disabled:opacity-50"
+                        className="absolute right-2 bottom-2 bg-[var(--gold)] hover:bg-[var(--rust)] text-black hover:text-white p-1.5 rounded-lg transition-colors shadow-sm disabled:opacity-50"
                         title="Send Message"
                     >
                         <Send size={14} />

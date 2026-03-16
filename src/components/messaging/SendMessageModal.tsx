@@ -35,9 +35,9 @@ export default function SendMessageModal({ isOpen, onClose, receiverId, receiver
     if (!isOpen) return null
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-[var(--bg)] w-full max-w-md rounded-xl shadow-2xl overflow-hidden border border-[var(--bdr)] animate-in zoom-in-95 duration-200">
-                <div className="p-5 border-b border-[var(--bdr)] flex justify-between items-center bg-[var(--card)]">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl animate-in fade-in duration-200">
+            <div className="bg-[#1c1915] w-full max-w-md rounded-xl shadow-2xl overflow-hidden border border-[var(--gold)]/20 animate-in zoom-in-95 duration-200">
+                <div className="p-5 border-b border-[var(--bdr)] flex justify-between items-center bg-[#1c1915]">
                     <div className="flex items-center gap-2 text-[var(--gold)]">
                         <Mail size={18} />
                         <h2 className="font-serif font-bold text-lg text-[var(--text)]">Direct Message</h2>
@@ -47,10 +47,10 @@ export default function SendMessageModal({ isOpen, onClose, receiverId, receiver
                     </button>
                 </div>
 
-                <form onSubmit={handleSend} className="p-5">
+                <form onSubmit={handleSend} className="p-5 bg-[#1c1915]">
                     <div className="mb-4">
                         <label className="block text-[10px] font-bold tracking-widest uppercase text-[var(--sub)] font-mono mb-1.5">Recipient</label>
-                        <div className="bg-[var(--surf)] border border-[var(--bdr)] rounded-md px-3 py-2 text-sm text-[var(--text)] font-semibold">
+                        <div className="bg-[#242018] border border-[var(--bdr)] rounded-md px-3 py-2 text-sm text-[var(--text)] font-semibold">
                             @{receiverName}
                         </div>
                     </div>
@@ -63,7 +63,7 @@ export default function SendMessageModal({ isOpen, onClose, receiverId, receiver
                             disabled={isSending}
                             placeholder="Type your message here..."
                             required
-                            className="w-full bg-[var(--surf)] border border-[var(--bdr)] rounded-md p-3 text-sm text-[var(--text)] min-height-[120px] resize-none focus:outline-none focus:border-[var(--gold)] transition-all"
+                            className="w-full bg-[#242018] border border-[var(--bdr)] rounded-md p-3 text-sm text-[var(--text)] min-h-[120px] resize-none focus:outline-none focus:border-[var(--gold)] transition-all"
                             rows={4}
                         />
                         <p className="text-[9px] text-[var(--sub)] mt-2 italic font-mono">

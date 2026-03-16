@@ -23,7 +23,7 @@ export default function DebateCommentActions({ comment, debateId, userId, isClos
     const initialUserLiked = comment.likes?.some((l: any) => l.user_id === userId) || false;
 
     return (
-        <div className="flex flex-col w-full pt-1.5 mt-1 border-t border-black/5 opacity-80 hover:opacity-100 transition-opacity">
+        <div className="flex flex-col w-full pt-1.5 mt-1 border-t border-[var(--bdr)] transition-all">
             <div className="flex justify-between items-center w-full">
                 <div className="flex items-center gap-6">
                     <LikeButton
@@ -35,7 +35,7 @@ export default function DebateCommentActions({ comment, debateId, userId, isClos
                     {!isClosed && (
                         <button
                             onClick={() => setIsReplying(!isReplying)}
-                            className="flex items-center gap-1.5 text-xs font-bold text-gray-500 hover:text-[#0055ff] transition-colors hover:bg-blue-50 px-2 py-1 -ml-2 rounded-md"
+                            className="flex items-center gap-1.5 text-xs font-bold text-[var(--sub)] hover:text-[var(--gold)] transition-colors hover:bg-[var(--surf)] px-2 py-1 -ml-2 rounded-md"
                         >
                             <CornerDownRight size={14} />
                             Reply
@@ -45,7 +45,7 @@ export default function DebateCommentActions({ comment, debateId, userId, isClos
                     {userId !== comment.author_id && (
                         <button
                             onClick={() => setMsgModal(true)}
-                            className="flex items-center gap-1.5 text-xs font-bold text-gray-500 hover:text-[#0055ff] transition-colors hover:bg-blue-50 px-2 py-1 -ml-2 rounded-md"
+                            className="flex items-center gap-1.5 text-xs font-bold text-[var(--sub)] hover:text-[var(--gold)] transition-colors hover:bg-[var(--surf)] px-2 py-1 -ml-2 rounded-md"
                         >
                             <Mail size={14} />
                             Message

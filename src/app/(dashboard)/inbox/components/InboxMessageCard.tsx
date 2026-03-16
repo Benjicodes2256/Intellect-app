@@ -43,25 +43,25 @@ export default function InboxMessageCard({ msg, currentUserId }: { msg: any, cur
 
     return (
         <div className={clsx(
-            "bg-white rounded-xl shadow-sm border p-4 transition-all mb-3 relative overflow-hidden",
-            isUnread ? "border-l-4 border-l-[#ff5500] border-y-gray-100 border-r-gray-100" : "border-gray-100",
-            isSentByMe && "bg-gray-50/50" // Slight tint for messages we sent
+            "bg-[var(--card)] rounded-xl shadow-sm border p-4 transition-all mb-3 relative overflow-hidden",
+            isUnread ? "border-l-4 border-l-[var(--gold)] border-y-[var(--bdr)] border-r-[var(--bdr)]" : "border-[var(--bdr)]",
+            isSentByMe && "bg-[var(--surf)]" // Solid tint for messages we sent
         )}>
             <div className="flex justify-between items-start mb-2">
                 <div className="flex items-center gap-2">
                     <div className={clsx(
-                        "w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs",
-                        isModerator ? "bg-gradient-to-tr from-gray-900 to-gray-700" : "bg-gradient-to-tr from-[#0055ff] to-[#ff5500]"
+                        "w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-inner",
+                        isModerator ? "bg-gradient-to-tr from-gray-900 to-gray-700" : "bg-gradient-to-tr from-[var(--violet)] to-[var(--rust)]"
                     )}>
                         {displayUsername.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                        <div className="font-bold text-sm text-gray-900 flex items-center gap-1">
-                            {isSentByMe ? <span className="text-gray-400 text-xs font-normal mr-1">To:</span> : null}
+                        <div className="font-bold text-sm text-[var(--text)] flex items-center gap-1">
+                            {isSentByMe ? <span className="text-[var(--sub)] text-xs font-normal mr-1">To:</span> : null}
                             {displayUsername}
-                            {isModerator && <span className="bg-gray-900 text-white text-[10px] px-1.5 py-0.5 rounded-sm font-bold">System</span>}
+                            {isModerator && <span className="bg-[var(--gold)] text-black text-[10px] px-1.5 py-0.5 rounded-sm font-bold">System</span>}
                         </div>
-                        <div className="text-xs text-gray-400 mb-1">
+                        <div className="text-xs text-[var(--sub)] mb-1 font-mono">
                             {new Date(msg.created_at).toLocaleDateString()}
                         </div>
                     </div>
@@ -70,16 +70,16 @@ export default function InboxMessageCard({ msg, currentUserId }: { msg: any, cur
                 <DeleteMessageButton messageId={msg.id} />
             </div>
 
-            <div className="text-sm text-gray-800 leading-relaxed mb-4 pl-10 whitespace-pre-wrap">
+            <div className="text-sm text-[var(--text)] leading-relaxed mb-4 pl-10 whitespace-pre-wrap">
                 {msg.content}
             </div>
 
             {!isModerator && !isSentByMe && (
-                <div className="pl-10 border-t border-gray-100 pt-3 mt-3">
+                <div className="pl-10 border-t border-[var(--bdr)] pt-3 mt-3">
                     {!replyOpen ? (
                         <button
                             onClick={() => setReplyOpen(true)}
-                            className="flex items-center gap-1.5 text-xs font-semibold text-[#0055ff] hover:text-blue-800 transition-colors"
+                            className="flex items-center gap-1.5 text-xs font-semibold text-[var(--gold)] hover:text-[var(--rust)] transition-colors"
                         >
                             <Reply size={14} /> Reply
                         </button>
@@ -91,13 +91,13 @@ export default function InboxMessageCard({ msg, currentUserId }: { msg: any, cur
                                 onChange={(e) => setReplyContent(e.target.value)}
                                 disabled={isSending}
                                 placeholder={`Reply to ${displayUsername}...`}
-                                className="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-2 bg-gray-50 focus:bg-white focus:outline-none focus:border-[#0055ff] focus:ring-2 focus:ring-[#0055ff]/10 transition-all"
+                                className="flex-1 text-sm border border-[var(--bdr)] rounded-lg px-3 py-2 bg-[var(--surf)] text-[var(--text)] focus:outline-none focus:border-[var(--gold)] focus:ring-1 focus:ring-[var(--gold)] transition-all"
                                 required
                             />
                             <button
                                 type="submit"
                                 disabled={isSending}
-                                className="bg-[#0055ff] text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center disabled:opacity-50"
+                                className="bg-[var(--gold)] text-black px-3 py-2 rounded-lg hover:bg-[var(--rust)] hover:text-white transition-colors flex items-center justify-center disabled:opacity-50"
                             >
                                 <Send size={16} />
                             </button>

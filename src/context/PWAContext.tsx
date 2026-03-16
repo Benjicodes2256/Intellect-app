@@ -7,6 +7,7 @@ interface PWAContextType {
     installPWA: () => Promise<void>;
     isInstallable: boolean;
     isIOS: boolean;
+    isInAppBrowser: boolean;
 }
 
 const PWAContext = createContext<PWAContextType | undefined>(undefined)
@@ -15,11 +16,17 @@ export const PWAProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
     const [isInstallable, setIsInstallable] = useState(false)
     const [isIOS, setIsIOS] = useState(false)
+    const [isInAppBrowser, setIsInAppBrowser] = useState(false)
 
     useEffect(() => {
         // Detect iOS
-        const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream
+        const ua = navigator.userAgent
+        const isIOSDevice = /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream
         setIsIOS(isIOSDevice)
+
+        // Detect in-app browsers (Instagram, FB, etc)
+        const inApp = /Instagram|FBAN|FBAV|Twitter|LinkedIn|Pinterest/i.test(ua)
+        setIsInAppBrowser(inApp)
 
         const handleBeforeInstallPrompt = (e: any) => {
             // Prevent Chrome 67 and earlier from automatically showing the prompt
@@ -62,7 +69,7 @@ export const PWAProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
 
     return (
-        <PWAContext.Provider value={{ deferredPrompt, installPWA, isInstallable, isIOS }}>
+        <PWAContext.Provider value={{ deferredPrompt, installPWA, isInstallable, isIOS, isInAppBrowser }}>
             {children}
         </PWAContext.Provider>
     )
