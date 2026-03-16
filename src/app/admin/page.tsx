@@ -8,6 +8,8 @@ import UserManagementPanel from './components/UserManagementPanel'
 import FlaggedContentPanel from './components/FlaggedContentPanel'
 import PrivateDebatesPanel from './components/PrivateDebatesPanel'
 
+import AdminKPICards from './components/AdminKPICards'
+
 export const dynamic = 'force-dynamic'
 
 // Admin page uses service role to bypass RLS for full visibility
@@ -48,6 +50,14 @@ export default async function AdminDashboardPage() {
     const closedDebates = closedDebatesRes.data || []
     const privateDebates = privateDebatesRes.data || []
 
+    const stats = [
+        { label: 'Total Users', value: usersRes.count || 0, icon: <Users size={16} />, color: 'var(--violet-lt)' },
+        { label: 'Total Posts', value: postsRes.count || 0, icon: <Activity size={16} />, color: 'var(--gold)' },
+        { label: 'Total Comments', value: commentsRes.count || 0, icon: <MessageSquare size={16} />, color: 'var(--sub)' },
+        { label: 'Open Debates', value: debatesRes.count || 0, icon: <Flame size={16} />, color: 'var(--rust)' },
+        { label: 'Private Debates', value: privateDebates.length, icon: <Lock size={16} />, color: 'var(--rust)', action: 'private-debates-section' },
+    ]
+
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg)', paddingBottom: '6rem' }}>
             <div style={{ maxWidth: '48rem', margin: '0 auto', padding: '1.5rem 1rem' }}>
@@ -65,29 +75,7 @@ export default async function AdminDashboardPage() {
                 </div>
 
                 {/* KPI cards */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.75rem', marginBottom: '1.5rem' }}>
-                    {[
-                        { label: 'Total Users', value: usersRes.count || 0, icon: <Users size={16} />, color: 'var(--violet-lt)' },
-                        { label: 'Total Posts', value: postsRes.count || 0, icon: <Activity size={16} />, color: 'var(--gold)' },
-                        { label: 'Total Comments', value: commentsRes.count || 0, icon: <MessageSquare size={16} />, color: 'var(--sub)' },
-                        { label: 'Open Debates', value: debatesRes.count || 0, icon: <Flame size={16} />, color: 'var(--rust)' },
-                        { label: 'Private Debates', value: privateDebates.length, icon: <Lock size={16} />, color: 'var(--rust)', action: 'private-debates-section' },
-                    ].map(stat => (
-                        <div 
-                            key={stat.label} 
-                            style={{ background: 'var(--card)', border: '1px solid var(--bdr)', borderRadius: '4px', padding: '1rem', cursor: stat.action ? 'pointer' : 'default' }}
-                            onClick={() => {
-                                if (stat.action) {
-                                    document.getElementById(stat.action)?.scrollIntoView({ behavior: 'smooth' });
-                                }
-                            }}
-                        >
-                            <div style={{ color: stat.color, marginBottom: '0.4rem' }}>{stat.icon}</div>
-                            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.8rem', fontWeight: 900, color: 'var(--text)', lineHeight: 1 }}>{stat.value}</div>
-                            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.46rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--sub)', marginTop: '0.25rem' }}>{stat.label}</div>
-                        </div>
-                    ))}
-                </div>
+                <AdminKPICards stats={stats} />
 
                 <PrivateDebatesPanel privateDebates={privateDebates} />
 
